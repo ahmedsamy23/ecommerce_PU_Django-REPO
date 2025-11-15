@@ -1,0 +1,778 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Store | Products{% endblock %}
+
+{% block content %}
+<!-- Categories Section Begin -->
+<section class="categories">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-6 p-0">
+                <div class="categories__item categories__large__item set-bg" data-setbg="{% static 'img/categories/category-6.png' %}">
+                    <div class="categories__text">
+                        <h1>Women's fashion</h1>
+                        <p>{{ women_count }} items</p>
+                        <p>Collection of modern women's fashion that suits all tastes and occasions.</p>
+                        <a href="{% url 'categories:category-list' 'Women' %}">Shop now</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="row">
+                    <div class="col-lg-6 col-md-6 col-sm-6 p-0">
+                        <div class="categories__item set-bg" data-setbg="{% static 'img/categories/category-2.jpg' %}">
+                            <div class="categories__text">
+                                <h4>Men's fashion</h4>
+                                <p>{{ men_count }} items</p>
+                                <a href="{% url 'categories:category-list' 'Men' %}">Shop now</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 col-md-6 col-sm-6 p-0">
+                        <div class="categories__item set-bg" data-setbg="{% static 'img/categories/category-3.jpg' %}">
+                            <div class="categories__text">
+                                <h4>Kid's fashion</h4>
+                                <p>{{ kids_count }} items</p>
+                                <a href="{% url 'categories:category-list' 'Kids' %}">Shop now</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 col-md-6 col-sm-6 p-0">
+                        <div class="categories__item set-bg" data-setbg="{% static 'img/categories/category-8.png' %}">
+                            <div class="categories__text">
+                                <h4>Beauty</h4>
+                                <p>{{ beauty_count }} items</p>
+                                <a href="{% url 'categories:category-list' 'Beauty' %}">Shop now</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 col-md-6 col-sm-6 p-0">
+                        <div class="categories__item set-bg" data-setbg="{% static 'img/categories/category-11.png' %}">
+                            <div class="categories__text">
+                                <h4>Accessories</h4>
+                                <p>{{ accessories_count }} items</p>
+                                <a href="{% url 'categories:category-list' 'Accessories' %}">Shop now</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- Categories Section End -->
+
+<!-- Product Section Begin -->
+<section class="product spad">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-4 col-md-4">
+                <div class="section-title">
+                    <h4>New product</h4>
+                </div>
+            </div>
+            <div class="col-lg-8 col-md-8">
+                <ul class="filter__controls">
+                    <li class="{% if not selected_category %}active{% endif %}" data-filter="*">All</li>
+                    <li class="{% if selected_category == 'Women' %}active{% endif %}" data-filter=".Women">Women's</li>
+                    <li class="{% if selected_category == 'Men' %}active{% endif %}" data-filter=".Men">Men's</li>
+                    <li class="{% if selected_category == 'Kids' %}active{% endif %}" data-filter=".Kids">Kid's</li>
+                    <li class="{% if selected_category == 'Accessories' %}active{% endif %}" data-filter=".Accessories">Accessories</li>
+                    <li class="{% if selected_category == 'Beauty' %}active{% endif %}" data-filter=".Beauty">Cosmetics</li>
+                </ul>
+            </div>
+        </div>
+        <div class="row property__gallery">
+            {% for item in items %}
+            <div class="col-lg-3 col-md-4 col-sm-6 mix {{ item.category }}">
+                <div class="product__item {% if item.label == 'S' %}sale{% endif %}">
+                    <div class="product__item__pic set-bg" data-setbg="{{ item.image.url }}">
+                        {% if item.label == 'N' %}
+                        <div class="label new">New</div>
+                        {% elif item.label == 'S' %}
+                        <div class="label sale">Sale</div>
+                        {% elif item.label == 'O' %}
+                        <div class="label stockout">out of stock</div>
+                        {% endif %}
+                        <ul class="product__hover">
+                            <li><a href="{% url 'core:product' item.slug %}"><span class="fa fa-eye"></span></a></li>
+                            <li><a href="{{ item.image.url }}" class="image-popup"><span class="arrow_expand"></span></a></li>
+                            <li><a href="{{ item.get_add_to_cart_url }}"><span class="icon_bag_alt"></span></a></li>
+                        </ul>
+                    </div>
+                    <div class="product__item__text">
+                        <h6><a href="{{ item.get_absolute_url }}">{{ item.title }}</a></h6>
+                        <div class="product__price">
+                            {% if item.discount_price %}
+                            $ {{ item.discount_price }} <span>$ {{ item.price }}</span>
+                            {% else %}
+                            $ {{ item.price }}
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-lg-12">
+                <p class="text-center">No products found in this category.</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+<!-- Product Section End -->
+
+<!-- Banner Section Begin -->
+<section class="banner set-bg" data-setbg="{% static 'img/banner/banner-1.jpg' %}">
+    <div class="container">
+        <div class="row">
+            <div class="col-xl-7 col-lg-8 m-auto">
+                <div class="banner__slider owl-carousel">
+                    <div class="banner__item">
+                        <div class="banner__text">
+                            <span>The Chloe Collection</span>
+                            <h1>The Project Jacket</h1>
+                            <a href="#">Shop now</a>
+                        </div>
+                    </div>
+                    <div class="banner__item">
+                        <div class="banner__text">
+                            <span>The Chloe Collection</span>
+                            <h1>The Project Jacket</h1>
+                            <a href="#">Shop now</a>
+                        </div>
+                    </div>
+                    <div class="banner__item">
+                        <div class="banner__text">
+                            <span>The Chloe Collection</span>
+                            <h1>The Project Jacket</h1>
+                            <a href="#">Shop now</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- Banner Section End -->
+
+<!-- Services Section Begin -->
+<section class="services spad">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-3 col-md-4 col-sm-6">
+                <div class="services__item">
+                    <i class="fa fa-car"></i>
+                    <h6>Free Shipping</h6>
+                    <p>For all order over $99</p>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-4 col-sm-6">
+                <div class="services__item">
+                    <i class="fa fa-money"></i>
+                    <h6>Money Back Guarantee</h6>
+                    <p>If good have Problems</p>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-4 col-sm-6">
+                <div class="services__item">
+                    <i class="fa fa-support"></i>
+                    <h6>Online Support 24/7</h6>
+                    <p>Dedicated support</p>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-4 col-sm-6">
+                <div class="services__item">
+                    <i class="fa fa-headphones"></i>
+                    <h6>Payment Secure</h6>
+                    <p>100% secure payment</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- Services Section End -->
+
+<style>
+/* Enhanced Animations and Transitions */
+
+/* Categories Section Animations */
+.categories__item {
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.categories__item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left 0.7s;
+}
+
+.categories__item:hover::before {
+    left: 100%;
+}
+
+.categories__item:hover {
+    transform: scale(1.02);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
+
+.categories__text {
+    transform: translateY(0);
+    transition: all 0.4s ease;
+}
+
+.categories__item:hover .categories__text {
+    transform: translateY(-10px);
+}
+
+.categories__text a {
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.categories__text a::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: #ca1515;
+    transform: scaleX(1);
+    transition: transform 0.3s ease;
+}
+
+.categories__text a:hover::after {
+    transform: scaleX(1.2);
+}
+
+/* Filter Controls Animations */
+.filter__controls {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+
+.filter__controls li {
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    padding: 8px 0;
+}
+
+.filter__controls li::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    width: 0;
+    height: 2px;
+    background: #ca1515;
+    transition: all 0.3s ease;
+    transform: translateX(-50%);
+}
+
+.filter__controls li:hover::before,
+.filter__controls li.active::before {
+    width: 100%;
+}
+
+.filter__controls li:hover {
+    color: #ca1515;
+    transform: translateY(-2px);
+}
+
+/* Product Items Enhanced Animations */
+.product__item {
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    animation: fadeInUp 0.6s ease forwards;
+    opacity: 0;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Stagger animation for items */
+.product__item:nth-child(1) { animation-delay: 0.1s; }
+.product__item:nth-child(2) { animation-delay: 0.2s; }
+.product__item:nth-child(3) { animation-delay: 0.3s; }
+.product__item:nth-child(4) { animation-delay: 0.4s; }
+.product__item:nth-child(5) { animation-delay: 0.5s; }
+.product__item:nth-child(6) { animation-delay: 0.6s; }
+.product__item:nth-child(7) { animation-delay: 0.7s; }
+.product__item:nth-child(8) { animation-delay: 0.8s; }
+
+.product__item:hover {
+    transform: translateY(-10px) scale(1.02);
+    box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+    z-index: 10;
+}
+
+.product__item__pic {
+    position: relative;
+    overflow: hidden;
+}
+
+.product__item__pic::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(202,21,21,0.1) 0%, rgba(17,17,17,0.1) 100%);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+}
+
+.product__item:hover .product__item__pic::after {
+    opacity: 1;
+}
+
+/* Product Hover Icons - Fixed Click Issue */
+.product__hover {
+    opacity: 0;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    transform: translateY(20px);
+    pointer-events: none; /* Prevent blocking clicks when hidden */
+}
+
+.product__item:hover .product__hover {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto; /* Enable clicks when visible */
+}
+
+.product__hover li {
+    transition: all 0.3s ease;
+    animation: bounceIn 0.5s ease forwards;
+    opacity: 0;
+    pointer-events: auto; /* Ensure list items are clickable */
+}
+
+@keyframes bounceIn {
+    0% {
+        opacity: 0;
+        transform: scale(0.3) translateY(100px);
+    }
+    50% {
+        opacity: 1;
+        transform: scale(1.05);
+    }
+    70% {
+        transform: scale(0.9);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+.product__item:hover .product__hover li:nth-child(1) {
+    animation-delay: 0.1s;
+}
+
+.product__item:hover .product__hover li:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.product__item:hover .product__hover li:nth-child(3) {
+    animation-delay: 0.3s;
+}
+
+.product__hover li a {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: block; /* Ensure full clickable area */
+    position: relative;
+    z-index: 10; /* Bring to front */
+}
+
+.product__hover li:hover a {
+    background: #ca1515;
+    transform: rotate(360deg) scale(1.1);
+}
+
+.product__hover li:hover a span {
+    color: #ffffff;
+}
+
+/* Ensure icons are clickable */
+.product__hover li a span {
+    pointer-events: none; /* Let clicks pass through to parent <a> */
+    display: block;
+}
+
+/* Label Animations */
+.label {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    background: #ca1515;
+    color: #ffffff;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    padding: 3px 10px;
+    z-index: 2;
+    animation: slideInLeft 0.5s ease;
+    transition: all 0.3s ease;
+}
+
+@keyframes slideInLeft {
+    from {
+        transform: translateX(-100px);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+.product__item:hover .label {
+    transform: scale(1.1);
+}
+
+.label.new {
+    background: #6c9a2e;
+}
+
+.label.stockout {
+    background: #111111;
+}
+
+/* Product Text Animations */
+.product__item__text h6 a {
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.product__item__text h6 a::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 0;
+    height: 1px;
+    background: #ca1515;
+    transition: width 0.3s ease;
+}
+
+.product__item__text h6 a:hover::after {
+    width: 100%;
+}
+
+.product__item__text h6 a:hover {
+    color: #ca1515;
+}
+
+/* Rating Stars Animation */
+.rating i {
+    display: inline-block;
+    transition: all 0.3s ease;
+}
+
+.product__item:hover .rating i {
+    animation: starPulse 0.5s ease infinite alternate;
+}
+
+@keyframes starPulse {
+    from {
+        transform: scale(1);
+    }
+    to {
+        transform: scale(1.2);
+    }
+}
+
+.product__item:hover .rating i:nth-child(1) { animation-delay: 0s; }
+.product__item:hover .rating i:nth-child(2) { animation-delay: 0.1s; }
+.product__item:hover .rating i:nth-child(3) { animation-delay: 0.2s; }
+.product__item:hover .rating i:nth-child(4) { animation-delay: 0.3s; }
+.product__item:hover .rating i:nth-child(5) { animation-delay: 0.4s; }
+
+/* Price Animations */
+.product__price {
+    transition: all 0.3s ease;
+}
+
+.product__item:hover .product__price {
+    color: #ca1515;
+    transform: scale(1.05);
+}
+
+.product__price span {
+    color: #b1b0b0;
+    text-decoration: line-through;
+    margin-left: 5px;
+    font-size: 14px;
+    transition: all 0.3s ease;
+}
+
+/* Services Section Animations */
+.services__item {
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    padding: 20px;
+    border-radius: 10px;
+}
+
+.services__item:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    background: #f9f9f9;
+}
+
+.services__item i {
+    transition: all 0.4s ease;
+    display: inline-block;
+    position: relative;
+}
+
+.services__item:hover i {
+    transform: scale(1.2) rotate(360deg);
+    color: #ca1515;
+    left: -27px;
+}
+
+/* Instagram Section Animations */
+.instagram__item {
+    transition: all 0.4s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.instagram__item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(202,21,21,0.7);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    z-index: 1;
+}
+
+.instagram__item:hover::before {
+    opacity: 1;
+}
+
+.instagram__text {
+    position: relative;
+    z-index: 2;
+    transform: scale(0);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.instagram__item:hover .instagram__text {
+    transform: scale(1);
+}
+
+.instagram__text i {
+    animation: pulse 1.5s ease infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.2);
+    }
+}
+
+/* Banner Section Animations */
+.banner__text {
+    animation: fadeIn 1s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.banner__text span {
+    display: inline-block;
+    animation: slideInFromLeft 0.8s ease;
+}
+
+@keyframes slideInFromLeft {
+    from {
+        transform: translateX(-50px);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+.banner__text h1 {
+    animation: slideInFromRight 0.8s ease;
+}
+
+@keyframes slideInFromRight {
+    from {
+        transform: translateX(50px);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* Flexbox Utilities */
+.property__gallery {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+/* Responsive Flexbox */
+@media (max-width: 767px) {
+    .filter__controls {
+        justify-content: center;
+    }
+    
+    .property__gallery {
+        justify-content: center;
+    }
+}
+
+/* Smooth Scroll */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Loading Animation for Images */
+.set-bg {
+    background-size: cover;
+    background-position: center;
+    animation: imageLoad 0.8s ease;
+}
+
+@keyframes imageLoad {
+    from {
+        opacity: 0;
+        filter: blur(10px);
+    }
+    to {
+        opacity: 1;
+        filter: blur(0);
+    }
+}
+
+/* Fix for Clickable Icons - Critical */
+.product__item__pic .product__hover {
+    position: absolute;
+    left: 0;
+    width: 100%;
+    bottom: 30px;
+    text-align: center;
+    z-index: 20; /* Above everything in the product card */
+}
+
+.product__hover li {
+    list-style: none;
+    display: inline-block;
+    margin-right: 10px;
+}
+
+.product__hover li a {
+    font-size: 18px;
+    color: #111111;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 45px;
+    width: 45px;
+    background: #ffffff;
+    line-height: 45px;
+    text-align: center;
+    border-radius: 50%;
+    cursor: pointer; /* Ensure cursor shows it's clickable */
+}
+
+/* Ensure elegant-icons render properly */
+.arrow_expand:before,
+.icon_heart_alt:before,
+.icon_bag_alt:before {
+    display: inline-block;
+    font-family: 'ElegantIcons';
+    font-style: normal;
+    font-weight: normal;
+    line-height: 1;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+</style>
+
+<script>
+// Enhanced JavaScript for Animations
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize Mixitup if available
+    if (typeof mixitup !== 'undefined' && document.querySelector('.property__gallery')) {
+        const mixer = mixitup('.property__gallery', {
+            animation: {
+                duration: 400,
+                nudge: true,
+                reverseOut: false,
+                effects: 'fade translateZ(-100px) stagger(50ms)'
+            },
+            selectors: {
+                target: '.mix'
+            }
+        });
+    }
+    
+    // Add intersection observer for fade-in animations
+    const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -100px 0px'
+    };
+    
+    const observer = new IntersectionObserver(function(entries) {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.style.opacity = '1';
+                entry.target.style.transform = 'translateY(0)';
+            }
+        });
+    }, observerOptions);
+    
+    // Observe all product items
+    document.querySelectorAll('.product__item').forEach(item => {
+        observer.observe(item);
+    });
+    
+    // Observe services items
+    document.querySelectorAll('.services__item').forEach(item => {
+        observer.observe(item);
+    });
+});
+</script>
+{% endblock %}

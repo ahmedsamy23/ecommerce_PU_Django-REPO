@@ -1,0 +1,115 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<section class="breadcrumb-option">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="breadcrumb__text">
+                    <h4>Shopping Cart</h4>
+                    <div class="breadcrumb__links">
+                        <a href="{% url 'core:item-list' %}" class="fa fa-home"> Home</a>
+                        <span>Shopping Cart</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="shop-cart spad">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                {% if object.items.count > 0 %}
+                <div class="shop__cart__table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>Price</th>
+                                <th>Quantity</th>
+                                <th>Total</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for order_item in object.items.all %}
+                            <tr>
+                                <td class="cart__product__item">
+                                    {% if order_item.item.image %}
+                                    <img src="{{ order_item.item.image.url }}" alt="{{ order_item.item.title }}" style="max-width: 15%; max-height: 15%;">
+                                    {% else %}
+                                    <img src="{% static 'images/placeholder.jpg' %}" alt="Placeholder">
+                                    {% endif %}
+                                    <div class="cart__product__item__title">
+                                        <h6>{{ order_item.item.title }}</h6>
+                                    </div>
+                                </td>
+                                <td class="cart__price">$ {{ order_item.item.price|floatformat:2 }}</td>
+                                <td class="cart__quantity">
+                                    <div class="proqty">
+                                        <span><a href="{% url 'core:remove-single-item-from-cart' order_item.item.slug %}" style="color: #3a3939;"><i class="fa fa-minus mr-2"></i></a></span>
+                                        <span style="color: #111111;">{{ order_item.quantity }}</span>
+                                        <span><a href="{% url 'core:add-to-cart' order_item.item.slug %}" style="color: #3a3939;"><i class="fa fa-plus ml-2"></i></a></span>
+                                    </div>
+                                </td>
+                                <td class="cart__total">
+                                    {% if order_item.item.discount_price %}
+                                    ${{ order_item.get_total_discount_item_price }}
+                                    <span class="badge badge-primary">Saving ${{ order_item.get_amount_saved}}</span>
+                                    {% else %}
+                                    ${{ order_item.get_total_item_price }}
+                                    {% endif %}
+                                </td>
+                                <td class="cart__close">
+                                    <a href="{% url 'core:remove-from-cart' order_item.item.slug %}"><span class="icon_close"></span></a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="alert alert-info">Your cart is empty.</div>
+                {% endif %}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-6 col-md-6 col-sm-6">
+                <div class="cart__btn">
+                    <a href="{% url 'core:item-list' %}" class="primary-btn">Continue Shopping</a>
+                </div>
+            </div>
+            <div class="col-lg-6 col-md-6 col-sm-6">
+                <div class="cart__btn update__btn">
+                    <a href="{% url 'core:order-summary' %}" class="primary-btn"><span class="icon_loading"></span> Update cart</a>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-6">
+                <div class="cart__discount">
+                    {% if object.coupon %}
+                    <h6> Promo code</h6>
+                    <li class="checkout__order__total">
+                        <span>Code: {{ object.coupon.code }}</span>
+                        <span class="text-success font-weight-bold ml-2">-${{ object.coupon.amount }}</span>
+                    </li>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="col-lg-4 offset-lg-2">
+                <div class="cart__total__procced">
+                    <h6>Cart total</h6>
+                    <ul>
+                        <li>Total <span>$ {{ object.get_total|floatformat:2 }}</span></li>
+                    </ul>
+                    <a href="{% url 'checkout:checkout' %}" class="primary-btn">Proceed to checkout</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

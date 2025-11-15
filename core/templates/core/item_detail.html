@@ -1,0 +1,219 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<!-- Breadcrumb Begin -->
+<div class="breadcrumb-option">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="breadcrumb__links">
+                    <a href="{% url 'core:item-list' %}"><i class="fa fa-home"></i> Home</a>
+                    <a href="{% url 'categories:category-list' item.category %}">{{ item.category }}</a>
+                    <span>{{ item.title }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Breadcrumb End -->
+
+<!-- Product Details Section Begin -->
+<section class="product-details spad">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-6">
+                <div class="product__details__pic">
+                    <div class="product__details__pic__left product__thumb nice-scroll">
+                        {% if item.image %}
+                            <a class="pt active" href="#product-1">
+                                <img src="{{ item.image.url }}" alt="{{ item.title }}">
+                            </a>
+                            <a class="pt" href="#product-2">
+                                <img src="{{ item.image.url }}" alt="{{ item.title }}">
+                            </a>
+                            <a class="pt" href="#product-3">
+                                <img src="{{ item.image.url }}" alt="{{ item.title }}">
+                            </a>
+                            <a class="pt" href="#product-4">
+                                <img src="{{ item.image.url }}" alt="{{ item.title }}">
+                            </a>
+                        {% else %}
+                            <a class="pt active" href="#product-1">
+                                <img src="{% static 'img/product/details/thumb-1.jpg' %}" alt="Default Product">
+                            </a>
+                            <a class="pt" href="#product-2">
+                                <img src="{% static 'img/product/details/thumb-2.jpg' %}" alt="Default Product">
+                            </a>
+                            <a class="pt" href="#product-3">
+                                <img src="{% static 'img/product/details/thumb-3.jpg' %}" alt="Default Product">
+                            </a>
+                            <a class="pt" href="#product-4">
+                                <img src="{% static 'img/product/details/thumb-4.jpg' %}" alt="Default Product">
+                            </a>
+                        {% endif %}
+                    </div>
+                    <div class="product__details__slider__content">
+                        <div class="product__details__pic__slider owl-carousel">
+                            {% if item.image %}
+                                <img data-hash="product-1" class="product__big__img" src="{{ item.image.url }}" alt="{{ item.title }}">
+                                <img data-hash="product-2" class="product__big__img" src="{{ item.image.url }}" alt="{{ item.title }}">
+                                <img data-hash="product-3" class="product__big__img" src="{{ item.image.url }}" alt="{{ item.title }}">
+                                <img data-hash="product-4" class="product__big__img" src="{{ item.image.url }}" alt="{{ item.title }}">
+                            {% else %}
+                                <img data-hash="product-1" class="product__big__img" src="{% static 'img/product/details/product-1.jpg' %}" alt="Default Product">
+                                <img data-hash="product-2" class="product__big__img" src="{% static 'img/product/details/product-3.jpg' %}" alt="Default Product">
+                                <img data-hash="product-3" class="product__big__img" src="{% static 'img/product/details/product-2.jpg' %}" alt="Default Product">
+                                <img data-hash="product-4" class="product__big__img" src="{% static 'img/product/details/product-4.jpg' %}" alt="Default Product">
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="product__details__text">
+                    <h3>{{ item.title }} 
+                        <span>Category: {{ item.get_category_display }} | {{ item.get_hyper_category_display }}</span>
+                    </h3>
+                    <div class="product__details__price">
+                        {% if item.discount_price %}
+                            $ {{ item.discount_price }} <span>$ {{ item.price }}</span>
+                        {% else %}
+                            $ {{ item.price }}
+                        {% endif %}
+                    </div>
+                    {% if item.description %}
+                    <p>{{ item.description }}</p>
+                    {% endif %} 
+                    <form method="post" action="{% url 'core:add-quantity' item.slug %}">
+                        {% csrf_token %}
+                        <div class="product__details__button">
+                            <div class="quantity">
+                                <span>Quantity:</span>
+                                <input type="number" name="quantity" value="1" min="1" 
+                                       style="width: 80px; height: 45px; border: 1px solid #e1e1e1; 
+                                              text-align: center; font-size: 14px; border-radius: 0; 
+                                              padding: 0 10px; margin-left: 10px;">
+                            </div>
+                            <button type="submit" class="cart-btn" style="margin-left: 15px;">
+                                <span class="icon_bag_alt"></span> Add to cart
+                            </button>
+                        </div>
+                    </form>
+                    
+                    <div class="product__details__widget">
+                        <ul>                           
+                            {% if item.available_colors.exists %}
+                            <li>
+                                <span>Available colors:</span>
+                                <div class="color__checkbox">
+                                    {% for color in item.available_colors.all %}
+                                    <label for="color-{{ color.id }}">
+                                        <input type="radio" name="color__radio" id="color-{{ color.id }}" {% if forloop.first %}checked{% endif %}>
+                                        <span class="checkmark" style="background-color: {{ color.code }};"></span>
+                                    </label>
+                                    {% endfor %}
+                                </div>
+                            </li>
+                            <style>
+                                /* حركة عند تمرير الماوس */
+                                .color__checkbox label:hover .checkmark {
+                                    transform: scale(1.1);
+                                    transition: all 0.3s ease;
+                                }
+                            
+                                /* أنيميشن عند التحديد */
+                                .color__checkbox input:checked + .checkmark {
+                                    transform: scale(1.15);
+                                    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+                                    transition: all 0.3s ease;
+                                    border: 1px solid #111111;
+                                }
+                            </style>
+                            {% endif %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-12">
+                <div class="product__details__tab">
+                    <ul class="nav nav-tabs" role="tablist">
+                        <li class="nav-item">
+                            <a class="nav-link active" data-toggle="tab" href="#tabs-1" role="tab">Description</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-toggle="tab" href="#tabs-2" role="tab">Specification</a>
+                        </li>
+                    </ul>
+                    <div class="tab-content">
+                        <div class="tab-pane active" id="tabs-1" role="tabpanel">
+                            <h6>Description</h6>
+                            {% if item.description %}
+                                <p>{{ item.description }}</p>
+                            {% else %}
+                                <p>No description available.</p>
+                            {% endif %}
+                        </div>
+                        <div class="tab-pane" id="tabs-2" role="tabpanel">
+                            <h6>Specification</h6>
+                            <p><strong>Category:</strong> {{ item.get_category_display }}</p>
+                            <p><strong>Type:</strong> {{ item.get_hyper_category_display }}</p>
+                            <p><strong>Material:</strong> Premium quality materials</p>
+                            <p><strong>Care Instructions:</strong> Follow care label instructions for best results</p>
+                            {% if item.discount_price %}
+                                <p><strong>Original Price:</strong> ${{ item.price }}</p>
+                                <p><strong>Sale Price:</strong> ${{ item.discount_price }}</p>
+                            {% else %}
+                                <p><strong>Price:</strong> ${{ item.price }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Related Products Section -->
+        {% if item.get_related_items %}
+        <div class="row">
+            <div class="col-lg-12 text-center">
+                <div class="related__title">
+                    <h5>RELATED PRODUCTS</h5>
+                </div>
+            </div>
+            {% for related_item in item.get_related_items|slice:":4" %}
+            <div class="col-lg-3 col-md-4 col-sm-6">
+                <div class="product__item">
+                    <div class="product__item__pic set-bg" data-setbg="{% if related_item.image %}{{ related_item.image.url }}{% else %}{% static 'img/product/related/rp-1.jpg' %}{% endif %}">
+                        {% if related_item.label == 'N' %}
+                            <div class="label new">New</div>
+                        {% elif related_item.label == 'S' %}
+                            <div class="label sale">Sale</div>
+                        {% elif related_item.label == 'O' %}
+                            <div class="label stockout">out of stock</div>
+                        {% endif %}
+                        <ul class="product__hover">
+                            <li><a href="{% url 'core:product' related_item.slug %}"><span class="fa fa-eye"></span></a></li>
+                            <li><a href="{% if related_item.image %}{{ related_item.image.url }}{% else %}{% static 'img/product/related/rp-1.jpg' %}{% endif %}" class="image-popup"><span class="arrow_expand"></span></a></li>
+                            <li><a href="#"><span class="icon_heart_alt"></span></a></li>
+                            <li><a href="{% url 'core:add-to-cart' related_item.slug %}"><span class="icon_bag_alt"></span></a></li>
+                        </ul>
+                    </div>
+                    <div class="product__item__text">
+                        <h6><a href="{{ related_item.get_absolute_url }}">{{ related_item.title }}</a></h6>
+                        <div class="product__price">
+                            {% if related_item.discount_price %}
+                                $ {{ related_item.discount_price }} <span>$ {{ related_item.price }}</span>
+                            {% else %}
+                                $ {{ related_item.price }}
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+</section>
+<!-- Product Details Section End -->
+{% endblock %}
