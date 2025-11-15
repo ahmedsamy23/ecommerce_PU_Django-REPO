@@ -1,0 +1,165 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% block content %}
+<!-- Breadcrumb Section Begin -->
+<section class="breadcrumb-option">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="breadcrumb__links">
+                    <a href="{% url 'core:item-list' %}"><i class="fa fa-home"></i> Home</a>
+                    <a href="{% url 'core:order-summary' %}">Shopping cart</a>
+                    <span>Checkout</span>
+                </div>   
+                <div class="checkout__order__total">
+                {% if DISPLAY_COUPON_FORM %}
+                    <h6 class="coupon__link"><span class="icon_tag_alt"></span> Have a coupon? Click here to enter your code.</h6>
+                    <form class="card p-2 coupon-form" action="{% url 'checkout:add-coupon' %}" method="POST" style="border: none !important;">
+                        {% csrf_token %}
+                        <div class="col-lg-12">
+                            <div class="col-lg-12">
+                                {{ coupon_form|crispy }}
+                                <button type="submit" class="site-btn place-btn mt-3">Apply Coupon</button>
+                            </div>
+                        </div>
+                    </form>
+                {% endif %}
+            </div>            
+        </div>
+    </div>
+</section>
+<!-- Breadcrumb Section End -->
+
+<!-- Checkout Section Begin -->
+<section class="checkout-section spad">
+    <div class="container">
+        <form method="POST" class="checkout-form">
+            {% csrf_token %}
+            <div class="row">
+                <!-- Billing Details -->
+                <div class="col-lg-8">
+                    <div class="checkout-content">
+                        <h4>Billing Details</h4>
+                        <div class="row">
+                            <div class="col-lg-6">
+                                {{ form.street_address|as_crispy_field }}
+                                {% if form.street_address.errors %}
+                                    <div class="invalid-feedback d-block">{{ form.street_address.errors }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-lg-6">
+                                {{ form.apartment_address|as_crispy_field }}
+                                {% if form.apartment_address.errors %}
+                                    <div class="invalid-feedback d-block">{{ form.apartment_address.errors }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-lg-6">
+                                {{ form.country|as_crispy_field }}
+                                {% if form.country.errors %}
+                                    <div class="invalid-feedback d-block">{{ form.country.errors }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-lg-6">
+                                {{ form.zip|as_crispy_field }}
+                                {% if form.zip.errors %}
+                                    <div class="invalid-feedback d-block">{{ form.zip.errors }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-lg-12">
+                                {{ form.payment_option|as_crispy_field }}
+                                {% if form.payment_option.errors %}
+                                    <div class="invalid-feedback d-block">{{ form.payment_option.errors }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-lg-12">
+                                {{ form.default|as_crispy_field }}
+                                {% if form.default.errors %}
+                                    <div class="invalid-feedback d-block">{{ form.default.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Order Summary -->
+                <div class="col-lg-4">
+                    <div class="checkout__order">
+                        <h4 class="mb-3 mt-2">
+                            Your Order
+                            <span class="badge badge-secondary badge-pill ml-5" style="margin-left: 125px !important;">{{ order.items.count }}</span>
+                        </h4>
+                        
+                        <div class="checkout__order__product">
+                            {% if order %}
+                                <ul class="checkout__order__product__list">
+                                    <li>
+                                        <span class="top__text">Product</span>
+                                        <span class="top__text__right">Total</span>
+                                    </li>
+                                    {% for order_item in order.items.all %}
+                                        <li class="fw-normal">
+                                            {{ order_item.quantity }} x 
+                                            {{ order_item.item.title }} 
+                                            <span class="fw-bold">$ {{ order_item.get_final_item_price }}</span>
+                                        </li>
+                                    {% endfor %}
+                                    <li class="checkout__order__total">
+                                        <strong class="text-bold">Total</strong>
+                                        <span class="text-danger fw-bold">$ {{ order.get_total }}</span>
+                                    </li>
+                                </ul>
+                                <button type="submit" class="site-btn place-btn mt-3">Place Order</button>
+                            {% else %}
+                                <p>No active order found.</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</section>
+<!-- Checkout Section End -->
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const couponForm = document.querySelector('.coupon-form');
+    const couponLink = document.querySelector('.coupon__link');
+    
+    if (couponForm && couponLink) {
+        // إخفاء النموذج في البداية
+        couponForm.style.display = 'none';
+        couponForm.style.transition = 'all 0.3s ease-in-out';
+        couponForm.style.opacity = '0';
+        
+        // تنسيق الرابط
+        couponLink.style.cursor = 'pointer';
+        couponLink.style.transition = 'color 0.2s ease';
+        
+        // تغيير اللون عند التمرير
+        couponLink.addEventListener('mouseenter', function() {
+            this.style.color = '#ca1515';
+        });
+        
+        couponLink.addEventListener('mouseleave', function() {
+            this.style.color = '';
+        });
+        
+        // إظهار/إخفاء النموذج
+        couponLink.addEventListener('click', function() {
+            if (couponForm.style.display === 'none') {
+                couponForm.style.display = 'block';
+                setTimeout(() => {
+                    couponForm.style.opacity = '1';
+                }, 10);
+            } else {
+                couponForm.style.opacity = '0';
+                setTimeout(() => {
+                    couponForm.style.display = 'none';
+                }, 300);
+            }
+        });
+    }
+});
+</script>
+
+{% endblock %}

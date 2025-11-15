@@ -1,0 +1,29 @@
+<div class="col-md-12 mb-4">
+    {% if order.coupon %}
+    <li class="checkout__order__total">
+        <div class="text-success">
+        <h6 class="my-0">Promo code</h6>
+        <small>{{ order.coupon.code }}</small>
+        </div>
+        <span class="text-success">-${{ order.coupon.amount }}</span>
+    </li>
+    {% endif %}
+    <li class="checkout__order__total">
+        <span class="text-bold">Total (USD)</span>
+        <strong class="text-danger fw-bold">${{ order.get_total }}</strong>
+    </li>
+
+    {% if DISPLAY_COUPON_FORM %}
+    <form class="card p-2" action="{% url 'checkout:add-coupon' %}" method="POST">
+        {% csrf_token %}
+        <div class="input-group">
+            {{ coupon_form.code }}
+            <div class="input-group-append">
+            <button class="btn btn-primary btn-md waves-effect m-0" type="submit">Redeem</button>
+            </div>
+        </div>
+    </form>
+    {% endif %}
+
+</div>
+
