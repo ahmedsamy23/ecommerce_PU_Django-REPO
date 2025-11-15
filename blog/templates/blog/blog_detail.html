@@ -1,0 +1,452 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ blog.title }} | Ashion{% endblock %}
+
+{% block content %}
+<!-- Breadcrumb Begin -->
+<div class="breadcrumb-option">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="breadcrumb__links">
+                    <a href="{% url 'core:item-list' %}"><i class="fa fa-home"></i> Home</a>
+                    <a href="{% url 'blog:blog-list' %}">Blog</a>
+                    <span>{{ blog.title }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Breadcrumb End -->
+
+<!-- Blog Details Section Begin -->
+<section class="blog-details spad">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-md-8">
+                <div class="blog__details__content">
+                    <div class="blog__details__item">
+                        <img src="{{ blog.image.url }}" alt="{{ blog.title }}" style="width: 100%; height: auto;">
+                        <div class="blog__details__item__title">
+                            {% if blog.category %}
+                            <span class="tip">{{ blog.category.name }}</span>
+                            {% endif %}
+                            <h4>{{ blog.title }}</h4>
+                            <ul>
+                                <li>by <span>{{ blog.user.username }}</span></li>
+                                <li>{{ blog.created_at|date:"M d, Y" }}</li>
+                                <li>{{ comments.count }} Comment{% if comments.count != 1 %}s{% endif %}</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="blog__details__desc">
+                        <p>{{ blog.description|linebreaks }}</p>
+                    </div>
+                    
+                    {% if blog.tags.all %}
+                    <div class="blog__details__tags">
+                        {% for tag in blog.tags.all %}
+                        <a href="#">{{ tag.name }}</a>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    {% if user.is_authenticated and user == blog.user %}
+                    <div class="blog__details__btns">
+                        <div class="row">
+                            <div class="col-lg-6 col-md-6 col-sm-6">
+                                <div class="blog__details__btn__item">
+                                    <h6><a href="{% url 'blog:blog-update' blog.slug %}" style="color: #ca1515;">
+                                        <i class="fa fa-edit"></i> Edit Post</a>
+                                    </h6>
+                                </div>
+                            </div>
+                            <div class="col-lg-6 col-md-6 col-sm-6">
+                                <div class="blog__details__btn__item blog__details__btn__item--next">
+                                    <h6><a href="{% url 'blog:blog-delete' blog.slug %}" style="color: #ca1515;">
+                                        Delete Post <i class="fa fa-trash"></i></a>
+                                    </h6>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <div class="blog__details__comment" id="blog__details__comment">
+                        <h5>{{ comments.count }} Comment{% if comments.count != 1 %}s{% endif %}</h5>
+                        {% if user.is_authenticated %}
+                        <a href="#comment-form" class="leave-btn">Leave a comment</a>
+                        {% endif %}
+                        
+                        {% for comment in comments %}
+                        <div class="blog__comment__item">
+                            <div class="blog__comment__item__pic">
+                                {% if comment.user.userprofile.image %}
+                                    <img src="{{ comment.user.userprofile.image.url }}" alt="{{ comment.user.username }}">
+                                {% else %}
+                                    <img src="{% static 'img/blog/details/comment-1.jpg' %}" alt="{{ comment.user.username }}">
+                                {% endif %}
+                            </div>
+                            <div class="blog__comment__item__text">
+                                <h6>{{ comment.user.username }}</h6>
+                                <p>{{ comment.content }}</p>
+                                <ul>
+                                    <li><i class="fa fa-clock-o"></i> {{ comment.created_at|date:"M d, Y" }}</li>
+                                    {% if user.is_authenticated %}
+                                    <li><a href="#reply-form-{{ comment.id }}" class="reply-link"><i class="fa fa-reply"></i> Reply</a></li>
+                                    {% endif %}
+                                    {% if user.is_authenticated and user == comment.user %}
+                                    <li>
+                                        <form method="post" action="{% url 'blog:comment-delete' comment.id %}" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this comment?');">
+                                            {% csrf_token %}
+                                            <button type="submit" style="background:none;border:none;color:#ca1515;cursor:pointer;padding:0;font-size:14px;">
+                                                <i class="fa fa-trash"></i> Delete
+                                            </button>
+                                        </form>
+                                    </li>
+                                    {% endif %}
+                                </ul>
+                            </div>
+                        </div>
+
+                        <!-- Replies -->
+                        {% for comment_reply in comment.comment_reply.all %}
+                        <div class="blog__comment__item blog__comment__item--reply">
+                            <div class="blog__comment__item__pic">
+                                {% if comment_reply.user.userprofile.image %}
+                                    <img src="{{ comment_reply.user.userprofile.image.url }}" alt="{{ comment_reply.user.username }}">
+                                {% else %}
+                                    <img src="{% static 'img/blog/details/comment-2.jpg' %}" alt="{{ comment_reply.user.username }}">
+                                {% endif %}
+                            </div>
+                            <div class="blog__comment__item__text">
+                                <h6>{{ comment_reply.user.username }}</h6>
+                                <p>{{ comment_reply.content }}</p>
+                                <ul>
+                                    <li><i class="fa fa-clock-o"></i> {{ comment_reply.created_at|date:"M d, Y" }}</li>
+                                </ul>
+                            </div>
+                        </div>
+                        {% endfor %}
+
+                        <!-- Reply Form -->
+                        {% if user.is_authenticated %}
+                        <div class="blog__comment__reply" id="reply-form-{{ comment.id }}" style="display:none;">
+                            <form method="post" action="{% url 'blog:comment-reply' comment.id %}">
+                                {% csrf_token %}
+                                <div class="form-group">
+                                    {{ comment_reply_form.content }}
+                                </div>
+                                <button type="submit" class="site-btn">Reply</button>
+                                <button type="button" class="site-btn cancel-reply" onclick="document.getElementById('reply-form-{{ comment.id }}').style.display='none';" style="background:#6c757d;margin-left:10px;">Cancel</button>
+                            </form>
+                        </div>
+                        {% endif %}
+
+                        {% empty %}
+                        <p style="text-align:center;color:#888;padding:30px 0;">No comments yet. Be the first to comment!</p>
+                        {% endfor %}
+
+                        <!-- Main Comment Form -->
+                        {% if user.is_authenticated %}
+                        <div class="blog__comment__form" id="comment-form">
+                            <h5>Leave a Comment</h5>
+                            <form method="post" action="{% url 'blog:blog-detail' blog.slug %}#comment-form">
+                                {% csrf_token %}
+                                <div class="form-group">
+                                    {{ comment_form.content }}
+                                </div>
+                                <button type="submit" class="site-btn">Comment</button>
+                            </form>
+                        </div>
+                        {% else %}
+                        <div style="margin-top: 40px; padding: 30px; background: #f8f9fa; text-align: center; border-radius: 5px;">
+                            <p style="margin:0;font-size:16px;color:#666;">Please <a href="{% url 'login' %}" style="color:#ca1515;font-weight:600;">login</a> to leave a comment.</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4 col-md-4">
+                <div class="blog__sidebar">
+                    <div class="blog__sidebar__item">
+                        <div class="section-title">
+                            <h4>Categories</h4>
+                        </div>
+                        <ul>
+                            <li><a href="{% url 'blog:blog-list' %}">All</a></li>
+                            {% for category in categories %}
+                            <li><a href="{% url 'blog:blog-list' %}?category={{ category.name }}">{{ category.name }}</a></li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+
+                    {% if recent_blogs %}
+                    <div class="blog__sidebar__item">
+                        <div class="section-title">
+                            <h4>Recent Posts</h4>
+                        </div>
+                        {% for recent_blog in recent_blogs %}
+                        <a href="{% url 'blog:blog-detail' recent_blog.slug %}" class="blog__feature__item">
+                            <div class="blog__feature__item__pic">
+                                <img src="{{ recent_blog.image.url }}" alt="{{ recent_blog.title }}" style="width: 115px; height: 80px; object-fit: cover;">
+                            </div>
+                            <div class="blog__feature__item__text">
+                                <h6 style="color:#000;">{{ recent_blog.title|truncatechars:45 }}</h6>
+                                <span>{{ recent_blog.created_at|date:"M d, Y" }}</span>
+                            </div>
+                        </a>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    {% if all_tags %}
+                    <div class="blog__sidebar__item">
+                        <div class="section-title">
+                            <h4>Tags cloud</h4>
+                        </div>
+                        <div class="blog__sidebar__tags">
+                            {% for tag in all_tags %}
+                            <a href="#">{{ tag.name }}</a>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- Blog Details Section End -->
+
+<style>
+/* تحسين تصميم الـ Comments */
+.blog__comment__item {
+    margin-bottom: 40px;
+    display: flex;
+    gap: 20px;
+}
+
+.blog__comment__item__pic {
+    flex-shrink: 0;
+}
+
+.blog__comment__item__pic img {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.blog__comment__item__text h6 {
+    font-size: 16px;
+    font-weight: 600;
+    color: #111111;
+    margin-bottom: 10px;
+}
+
+.blog__comment__item__text p {
+    color: #666;
+    line-height: 1.8;
+    margin-bottom: 15px;
+}
+
+.blog__comment__item__text ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.blog__comment__item__text ul li {
+    font-size: 14px;
+    color: #888;
+}
+
+.blog__comment__item__text ul li i {
+    margin-right: 5px;
+}
+
+.reply-link {
+    color: #ca1515 !important;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.reply-link:hover {
+    color: #a01010 !important;
+}
+
+/* تصميم الـ Reply */
+.blog__comment__item--reply {
+    margin-left: 100px;
+    margin-bottom: 30px;
+    padding-left: 30px;
+    border-left: 3px solid #f0f0f0;
+}
+
+.blog__comment__item--reply .blog__comment__item__pic img {
+    width: 60px;
+    height: 60px;
+}
+
+/* تصميم الـ Reply Form */
+.blog__comment__reply {
+    margin-left: 100px;
+    margin-bottom: 30px;
+    padding: 25px;
+    background: #f8f9fa;
+    border-radius: 5px;
+    border-left: 3px solid #ca1515;
+}
+
+.blog__comment__reply form {
+    margin: 0;
+}
+
+.blog__comment__reply .form-group {
+    margin-bottom: 20px;
+}
+
+.blog__comment__reply textarea {
+    width: 100%;
+    padding: 15px;
+    border: 1px solid #e1e1e1;
+    border-radius: 5px;
+    min-height: 100px;
+    font-size: 14px;
+    resize: vertical;
+}
+
+.blog__comment__reply textarea:focus {
+    outline: none;
+    border-color: #ca1515;
+}
+
+/* تصميم الـ Main Comment Form */
+.blog__comment__form {
+    margin-top: 50px;
+    padding-top: 40px;
+    border-top: 1px solid #e1e1e1;
+}
+
+.blog__comment__form h5 {
+    font-size: 20px;
+    font-weight: 600;
+    color: #111111;
+    margin-bottom: 25px;
+}
+
+.blog__comment__form .form-group {
+    margin-bottom: 20px;
+}
+
+.blog__comment__form textarea {
+    width: 100%;
+    padding: 15px;
+    border: 1px solid #e1e1e1;
+    border-radius: 5px;
+    min-height: 150px;
+    font-size: 14px;
+    resize: vertical;
+}
+
+.blog__comment__form textarea:focus {
+    outline: none;
+    border-color: #ca1515;
+}
+
+/* تصميم الأزرار */
+.site-btn {
+    background: #ca1515;
+    color: #ffffff;
+    border: none;
+    padding: 12px 30px;
+    font-size: 14px;
+    font-weight: 600;
+    text-transform: uppercase;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.site-btn:hover {
+    background: #a01010;
+}
+
+.leave-btn {
+    display: inline-block;
+    background: #ffffff;
+    color: #ca1515;
+    padding: 12px 30px;
+    font-size: 14px;
+    font-weight: 600;
+    text-transform: uppercase;
+    border-radius: 5px;
+    margin-bottom: 30px;
+    transition: all 0.3s;
+}
+
+.leave-btn:hover {
+    background: #ca1515;
+    color: #ffffff;
+}
+
+/* Responsive */
+@media (max-width: 767px) {
+    .blog__comment__item--reply {
+        margin-left: 30px;
+        padding-left: 15px;
+    }
+    
+    .blog__comment__reply {
+        margin-left: 30px;
+    }
+    
+    .blog__comment__item__pic img {
+        width: 60px;
+        height: 60px;
+    }
+    
+    .blog__comment__item--reply .blog__comment__item__pic img {
+        width: 50px;
+        height: 50px;
+    }
+}
+</style>
+
+<script>
+// JavaScript لإظهار/إخفاء نموذج الرد
+document.addEventListener('DOMContentLoaded', function() {
+    const replyLinks = document.querySelectorAll('.reply-link');
+    
+    replyLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            const targetId = this.getAttribute('href');
+            const replyForm = document.querySelector(targetId);
+            
+            // إخفاء جميع نماذج الرد الأخرى
+            document.querySelectorAll('.blog__comment__reply').forEach(form => {
+                if (form !== replyForm) {
+                    form.style.display = 'none';
+                }
+            });
+            
+            // عرض/إخفاء النموذج المستهدف
+            if (replyForm.style.display === 'none' || replyForm.style.display === '') {
+                replyForm.style.display = 'block';
+                replyForm.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            } else {
+                replyForm.style.display = 'none';
+            }
+        });
+    });
+});
+</script>
+
+{% endblock %}

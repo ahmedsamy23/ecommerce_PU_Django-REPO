@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+
+{% block title %}Delete Blog | Ashion{% endblock %}
+
+{% block content %}
+<!-- Breadcrumb Begin -->
+<div class="breadcrumb-option">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="breadcrumb__links">
+                    <a href="{% url 'core:item-list' %}"><i class="fa fa-home"></i> Home</a>
+                    <a href="{% url 'blog:blog-list' %}">Blog</a>
+                    <span>Delete Blog</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Breadcrumb End -->
+
+<!-- Blog Delete Section Begin -->
+<section class="blog-details spad">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-md-8">
+                <div class="blog__details__content">
+                    <div class="blog__details__item">
+                        <div class="blog__details__item__title">
+                            <h4>Delete {{ blog.title }}?</h4>
+                        </div>
+                    </div>
+                    <div class="blog__details__desc">
+                        <p>Are you sure you want to delete this blog?</p>
+                        <form method="post">
+                            {% csrf_token %}
+                            <button type="submit" class="site-btn">Delete</button>
+                            <a href="{% url 'blog:blog-detail' blog.slug %}" class="site-btn">Cancel</a>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-4">
+                <!-- Sidebar مشابه -->
+                <div class="blog__sidebar">
+                    <!-- ... نفس الـ sidebar ... -->
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- Blog Delete Section End -->
+{% endblock %}
