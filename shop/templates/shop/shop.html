@@ -1,0 +1,814 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load cart_template_tags %}
+
+{% block content %}
+<style>
+    /* Enhanced Shop Styles */
+    .shop-hero {
+        background: linear-gradient(135deg, #d4cbd8 0%, #8a7676 100%);
+        padding: 80px 0;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .shop-hero::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="50" cy="50" r="1" fill="white" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+        animation: float 20s ease-in-out infinite;
+    }
+    
+    @keyframes float {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-20px); }
+    }
+    
+    .shop-hero-content {
+        position: relative;
+        z-index: 2;
+        text-align: center;
+        color: white;
+    }
+    
+    .shop-hero h1 {
+        font-size: 3.5rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        text-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        animation: slideInDown 1s ease-out;
+    }
+    
+    .shop-hero p {
+        font-size: 1.2rem;
+        opacity: 0.9;
+        animation: slideInUp 1s ease-out 0.3s both;
+    }
+    
+    @keyframes slideInDown {
+        from { transform: translateY(-50px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+    }
+    
+    @keyframes slideInUp {
+        from { transform: translateY(50px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+    }
+    
+    .filters-section {
+        background: #f8f9fa;
+        padding: 30px 0;
+        border-radius: 15px;
+        margin: 30px 0;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        animation: fadeInUp 0.8s ease-out;
+    }
+    
+    @keyframes fadeInUp {
+        from { transform: translateY(30px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+    }
+    
+    .filter-group {
+        margin-bottom: 20px;
+    }
+    
+    .filter-group label {
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 8px;
+        display: block;
+    }
+    
+    .filter-group select,
+    .filter-group input {
+        width: 100%;
+        padding: 12px 15px;
+        border: 2px solid #e3e6f0;
+        border-radius: 8px;
+        font-size: 14px;
+        transition: all 0.3s ease;
+        background: white;
+    }
+    
+    .filter-group select:focus,
+    .filter-group input:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        outline: none;
+        transform: translateY(-2px);
+    }
+    
+    .filter-buttons {
+        display: flex;
+        gap: 10px;
+        margin-top: 20px;
+    }
+    
+    .btn-filter {
+        background: linear-gradient(45deg, #667eea, #764ba2);
+        color: white;
+        border: none;
+        padding: 12px 25px;
+        border-radius: 25px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    }
+    
+    .btn-filter:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+    }
+    
+    .btn-clear {
+        background: #6c757d;
+        color: white;
+        border: none;
+        padding: 12px 25px;
+        border-radius: 25px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-clear:hover {
+        background: #5a6268;
+        transform: translateY(-2px);
+    }
+    
+    .products-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 30px;
+        margin-top: 30px;
+    }
+    
+    .product-card {
+        background: white;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        transition: all 0.3s ease;
+        position: relative;
+        animation: fadeInUp 0.6s ease-out;
+    }
+    
+    .product-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+    }
+    
+    .product-image {
+        position: relative;
+        overflow: hidden;
+        height: 450px; /* Increased height for better image display */
+        background: #f8f9fa;
+    }
+    
+    .product-image img {
+        width: 100%;
+        height: auto;
+        object-fit: cover; /* Changed to cover to fill the container */
+        transition: transform 0.3s ease;
+    }
+    
+    .product-card:hover .product-image img {
+        transform: scale(1.05); /* Reduced scale to avoid too much zoom */
+    }
+    
+    .product-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0,0,0,0.7);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+    
+    .product-card:hover .product-overlay {
+        opacity: 1;
+    }
+    
+    .product-actions {
+        display: flex;
+        gap: 10px;
+    }
+    
+    .action-btn {
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        border: none;
+        background: white;
+        color: #333;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .action-btn:hover {
+        background: #667eea;
+        color: white;
+        transform: scale(1.1);
+    }
+    
+    .product-label {
+        position: absolute;
+        top: 15px;
+        left: 15px;
+        padding: 8px 15px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+        z-index: 2;
+        letter-spacing: 1px;
+    }
+    
+    .label-new {
+        background: #28a745;
+        color: white;
+    }
+    
+    .label-sale {
+        background: #dc3545;
+        color: white;
+    }
+    
+    .label-out-of-stock {
+        background: #6c757d;
+        color: white;
+    }
+    
+    .product-info {
+        padding: 20px;
+        background: white;
+    }
+    
+    .product-title {
+        font-size: 18px;
+        font-weight: 600;
+        margin-bottom: 10px;
+        color: #2c3e50;
+        line-height: 1.4;
+    }
+    
+    .product-title a {
+        color: inherit;
+        text-decoration: none;
+        transition: color 0.3s ease;
+    }
+    
+    .product-title a:hover {
+        color: #667eea;
+    }
+    
+    .product-rating {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        margin-bottom: 15px;
+    }
+    
+    .star {
+        color: #ffc107;
+        font-size: 14px;
+    }
+    
+    .rating-count {
+        color: #6c757d;
+        font-size: 13px;
+        margin-left: 5px;
+    }
+    
+    .product-price {
+        font-size: 22px;
+        font-weight: 700;
+        color: #667eea;
+        margin-bottom: 10px;
+    }
+    
+    .product-price .original-price {
+        text-decoration: line-through;
+        color: #6c757d;
+        font-size: 18px;
+        margin-left: 10px;
+        font-weight: 400;
+    }
+    
+    .pagination-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-top: 50px;
+        gap: 10px;
+    }
+    
+    .pagination-btn {
+        padding: 12px 18px;
+        border: 2px solid #e3e6f0;
+        background: white;
+        color: #333;
+        text-decoration: none;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        font-weight: 600;
+    }
+    
+    .pagination-btn:hover,
+    .pagination-btn.active {
+        background: #667eea;
+        color: white;
+        border-color: #667eea;
+        transform: translateY(-2px);
+    }
+    
+    .results-info {
+        background: white;
+        padding: 25px;
+        border-radius: 15px;
+        margin-bottom: 30px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .results-count {
+        font-size: 16px;
+        font-weight: 600;
+        color: #2c3e50;
+    }
+    
+    .view-options {
+        display: flex;
+        gap: 10px;
+    }
+    
+    .view-options .btn {
+        padding: 8px 15px;
+        border: 2px solid #e3e6f0;
+        background: white;
+        color: #6c757d;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+    
+    .view-options .btn:hover,
+    .view-options .btn.active {
+        background: #667eea;
+        color: white;
+        border-color: #667eea;
+    }
+    
+    .sort-dropdown {
+        padding: 10px 15px;
+        border: 2px solid #e3e6f0;
+        border-radius: 8px;
+        background: white;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .sort-dropdown:focus {
+        border-color: #667eea;
+        outline: none;
+    }
+    
+    .no-results {
+        text-align: center;
+        padding: 80px 20px;
+        color: #6c757d;
+        grid-column: 1 / -1;
+    }
+    
+    .no-results i {
+        font-size: 64px;
+        margin-bottom: 20px;
+        opacity: 0.5;
+    }
+    
+    .no-results h3 {
+        font-size: 24px;
+        margin-bottom: 10px;
+        color: #2c3e50;
+    }
+    
+    .loading {
+        display: none;
+        text-align: center;
+        padding: 40px;
+        grid-column: 1 / -1;
+    }
+    
+    .loading-spinner {
+        border: 4px solid #f3f3f3;
+        border-top: 4px solid #667eea;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 20px;
+    }
+    
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+    
+    /* Mobile Responsive */
+    @media (max-width: 768px) {
+        .shop-hero h1 {
+            font-size: 2.5rem;
+        }
+        
+        .products-grid {
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+        
+        .product-image {
+            height: 280px;
+        }
+        
+        .filter-buttons {
+            flex-direction: column;
+        }
+        
+        .results-info {
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .view-options {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+    
+    @media (max-width: 576px) {
+        .products-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .product-image {
+            height: 250px;
+        }
+    }
+</style>
+
+<!-- Shop Hero Section -->
+<section class="shop-hero">
+    <div class="shop-hero-content">
+        <h1>Discover Amazing Products</h1>
+        <p>Find the perfect items from our curated collection</p>
+    </div>
+</section>
+
+<!-- Breadcrumb -->
+<div class="breadcrumb-option">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="breadcrumb__links">
+                    <a href="{% url 'core:item-list' %}"><i class="fa fa-home"></i> Home</a>
+                    <span>Shop</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Shop Section -->
+<section class="shop spad">
+    <div class="container">
+        <!-- Filters Section - Removed Search Input -->
+        <div class="filters-section">
+            <div class="row">
+                <div class="col-lg-12">
+                    <form method="GET" id="filter-form">
+                        <div class="row">
+                            <div class="col-lg-3 col-md-6 col-sm-6 ml-2">
+                                <div class="filter-group">
+                                    <label>Category</label>
+                                    {{ filter.form.category }}
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-md-6 col-sm-6">
+                                <div class="filter-group">
+                                    <label>Type</label>
+                                    {{ filter.form.hyper_category }}
+                                </div>
+                            </div>
+                            <!-- <div class="col-lg-3 col-md-6 col-sm-6">
+                                <div class="filter-group">
+                                    <label>Sort By</label>
+                                    {{ filter.form.sort_by }}
+                                </div>
+                            </div> -->
+                            <div class="col-lg-3 col-md-6 col-sm-6">
+                                <div class="filter-group">
+                                    <label>&nbsp;</label>
+                                    <div class="filter-buttons">
+                                        <!-- <button type="submit" class="btn-filter">
+                                            <i class="fa fa-filter"></i> Filter
+                                        </button> -->
+                                        <button type="button" style="margin-left: 20px; " class="btn-clear" onclick="clearFilters()">
+                                            <i class="fa fa-times"></i> Clear
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Info -->
+        <div class="results-info">
+            <div class="results-count">
+                <span>Showing {{ filter.qs.count }} results</span>
+            </div>
+            <!-- <div class="view-options">
+                <button class="btn btn-sm active" onclick="toggleView('grid')" id="grid-view">
+                    <i class="fa fa-th"></i> Grid
+                </button>
+                <button class="btn btn-sm" onclick="toggleView('list')" id="list-view">
+                    <i class="fa fa-list"></i> List
+                </button>
+            </div> -->
+        </div>
+
+        <!-- Loading Indicator -->
+        <div class="loading" id="loading">
+            <div class="loading-spinner"></div>
+            <p>Loading products...</p>
+        </div>
+
+        <!-- Products Grid -->
+        <div class="products-grid" id="products-container">
+            {% for item in filter.qs %}
+            <div class="product-card" data-category="{{ item.category }}" data-price="{{ item.price }}">
+                <div class="product-image">
+                    <img src="{% if item.image %}{{ item.image.url }}{% else %}{% static 'img/default.jpg' %}{% endif %}" alt="{{ item.title }}">
+                    
+                    {% if item.label == 'N' %}
+                    <div class="product-label label-new">New</div>
+                    {% elif item.label == 'S' %}
+                    <div class="product-label label-sale">Sale</div>
+                    {% elif item.label == 'O' %}
+                    <div class="product-label label-out-of-stock">Out of Stock</div>
+                    {% endif %}
+                    
+                    <div class="product-overlay">
+                        <div class="product-actions">
+                            <a href="{{ item.get_absolute_url }}">
+                                <button class="action-btn" title="Quick View">
+                                    <i class="fa fa-eye"></i>
+                                </button>
+                            </a>
+                            <a href="{{ item.image.url }}" class="image-popup">
+                                <button class="action-btn" title="Quick View">
+                                    <i class="fa fa-expand"></i>
+                                </button>
+                            </a>
+                            <a href="{{ item.get_add_to_cart_url }}">
+                                <button class="action-btn" title="Add to Cart">
+                                    <i class="fa fa-shopping-cart"></i>
+                                </button>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="product-info">
+                    <h6 class="product-title">
+                        <a href="{% url 'core:product' item.slug %}">{{ item.title }}</a>
+                    </h6>
+                    
+                    <div class="product-rating">
+                        <span class="star">★</span>
+                        <span class="star">★</span>
+                        <span class="star">★</span>
+                        <span class="star">★</span>
+                        <span class="star">★</span>
+                        <span class="rating-count">(4.5)</span>
+                    </div>
+                    
+                    <div class="product-price">
+                        {% if item.discount_price %}
+                        ${{ item.discount_price }}
+                        <span class="original-price">${{ item.price }}</span>
+                        {% else %}
+                        ${{ item.price }}
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="no-results">
+                <i class="fa fa-search"></i>
+                <h3>No products found</h3>
+                <p>Try adjusting your search or filter criteria</p>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Pagination -->
+        {% if is_paginated %}
+        <div class="pagination-container">
+            {% if page_obj.has_previous %}
+            <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.urlencode %}&{{ request.GET.urlencode }}{% endif %}" class="pagination-btn">
+                <i class="fa fa-chevron-left"></i>
+            </a>
+            {% endif %}
+            
+            {% for num in page_obj.paginator.page_range %}
+            {% if page_obj.number == num %}
+            <span class="pagination-btn active">{{ num }}</span>
+            {% else %}
+            <a href="?page={{ num }}{% if request.GET.urlencode %}&{{ request.GET.urlencode }}{% endif %}" class="pagination-btn">{{ num }}</a>
+            {% endif %}
+            {% endfor %}
+            
+            {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}{% if request.GET.urlencode %}&{{ request.GET.urlencode }}{% endif %}" class="pagination-btn">
+                <i class="fa fa-chevron-right"></i>
+            </a>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+<script>
+// Enhanced JavaScript functionality
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize animations
+    initializeAnimations();
+    
+    // Auto-submit form on filter change
+    const filterForm = document.getElementById('filter-form');
+    const filterInputs = filterForm.querySelectorAll('select');
+    
+    filterInputs.forEach(input => {
+        input.addEventListener('change', function() {
+            showLoading();
+            setTimeout(() => {
+                filterForm.submit();
+            }, 300);
+        });
+    });
+});
+
+function initializeAnimations() {
+    // Animate product cards on scroll
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.style.opacity = '1';
+                entry.target.style.transform = 'translateY(0)';
+            }
+        });
+    }, {
+        threshold: 0.1
+    });
+    
+    document.querySelectorAll('.product-card').forEach(card => {
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(30px)';
+        card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+        observer.observe(card);
+    });
+}
+
+function showLoading() {
+    document.getElementById('loading').style.display = 'block';
+    document.getElementById('products-container').style.opacity = '0.5';
+}
+
+function hideLoading() {
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('products-container').style.opacity = '1';
+}
+
+function clearFilters() {
+    const form = document.getElementById('filter-form');
+    const selects = form.querySelectorAll('select');
+    selects.forEach(select => {
+        select.selectedIndex = 0;
+    });
+    showLoading();
+    setTimeout(() => {
+        form.submit();
+    }, 300);
+}
+
+function toggleView(viewType) {
+    const container = document.getElementById('products-container');
+    const gridBtn = document.getElementById('grid-view');
+    const listBtn = document.getElementById('list-view');
+    
+    if (viewType === 'grid') {
+        container.style.display = 'grid';
+        container.style.gridTemplateColumns = 'repeat(auto-fill, minmax(300px, 1fr))';
+        gridBtn.classList.add('active');
+        listBtn.classList.remove('active');
+    } else {
+        container.style.display = 'grid';
+        container.style.gridTemplateColumns = 'repeat(auto-fill, minmax(380px, 1fr))';
+        listBtn.classList.add('active');
+        gridBtn.classList.remove('active');
+    }
+}
+
+function showNotification(message, type = 'info') {
+    const notification = document.createElement('div');
+    notification.className = `alert alert-${type}`;
+    notification.innerHTML = `
+        ${message}
+        <button type="button" class="close" onclick="this.parentElement.remove()">
+            <span>&times;</span>
+        </button>
+    `;
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 9999;
+        min-width: 300px;
+        animation: slideInRight 0.3s ease;
+    `;
+    
+    document.body.appendChild(notification);
+    
+    // Auto remove after 3 seconds
+    setTimeout(() => {
+        notification.style.animation = 'slideOutRight 0.3s ease';
+        setTimeout(() => {
+            notification.remove();
+        }, 300);
+    }, 3000);
+}
+
+// Add CSS for notification animations
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes slideInRight {
+        from { transform: translateX(100%); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+    }
+    
+    @keyframes slideOutRight {
+        from { transform: translateX(0); opacity: 1; }
+        to { transform: translateX(100%); opacity: 0; }
+    }
+    
+    .alert {
+        padding: 15px;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .alert-success {
+        background-color: #d4edda;
+        border: 1px solid #c3e6cb;
+        color: #155724;
+    }
+    
+    .alert-info {
+        background-color: #d1ecf1;
+        border: 1px solid #bee5eb;
+        color: #0c5460;
+    }
+    
+    .close {
+        background: none;
+        border: none;
+        font-size: 18px;
+        cursor: pointer;
+        padding: 0;
+        margin-left: 10px;
+    }
+`;
+document.head.appendChild(style);
+</script>
+{% endblock %}

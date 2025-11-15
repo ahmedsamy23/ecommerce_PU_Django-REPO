@@ -1,0 +1,705 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block title %}Payment - Ashion | Store{% endblock %}
+
+{% block content %}
+<div class="breadcrumb-option">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="breadcrumb__links">
+                    <a href="{% url 'core:item-list' %}"><i class="fa fa-home"></i> Home</a>
+                    <a href="{% url 'core:order-summary' %}">Shopping cart</a>
+                    <a href="{% url 'checkout:checkout' %}">Checkout</a>
+                    <span>Payment</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<section class="checkout spad">
+    <div class="container">
+        {% if messages %}
+            <div class="row">
+                <div class="col-lg-12">
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span>&times;</span>
+                            </button>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+
+        <div class="row">
+            <div class="col-lg-12">
+                <h6 class="coupon__link">
+                    <span class="icon_credit-card"></span> 
+                    <span>Secure Payment</span>
+                </h6>
+            </div>
+        </div>
+
+        <form method="POST" class="checkout__form" id="payment-form">
+            {% csrf_token %}
+            <div class="row">
+                <div class="col-lg-8">
+                    <h5>Payment Details</h5>
+                    
+                    {% if card %}
+                    <div class="payment__default-card">
+                        <div class="checkout__form__checkbox">
+                            <label for="id_use_default">
+                                <i class="fa fa-credit-card"></i>
+                                Use default payment method (**** **** **** {{ card.last4 }})
+                                {{ form.use_default }}
+                                <span class="checkmark"></span>
+                            </label>
+                            {% if form.use_default.help_text %}
+                            <small class="form-text text-muted">{{ form.use_default.help_text }}</small>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="payment__divider">
+                        <span>OR</span>
+                    </div>
+                    {% endif %}
+
+                    <div class="payment__card" id="new-card-section">
+                        <div class="checkout__form__input">
+                            <p>Card Information <span>*</span></p>
+                            <div id="card-element" class="card-element"></div>
+                            <input type="hidden" name="stripeToken" id="id_stripeToken">
+                            <div id="card-errors" role="alert" class="card-errors"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="payment__options">
+                        <div class="checkout__form__checkbox">
+                            <label for="id_save">
+                                <i class="fa fa-save"></i>
+                                Save this card for future purchases
+                                {{ form.save }}                              
+                                <span class="checkmark"></span>
+                            </label>
+                            {% if form.save.help_text %}
+                            <small class="form-text text-muted">{{ form.save.help_text }}</small>
+                            {% endif %}
+                            {% if form.save.errors %}
+                                <div class="field-errors">
+                                    {% for error in form.save.errors %}
+                                        <small class="text-danger">{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="payment__security">
+                        <div class="security__notice">
+                            <i class="fa fa-shield"></i>
+                            <span>Your payment information is secure and encrypted with SSL</span>
+                        </div>
+                        <div class="security__badges">
+                            <span style="font-size: 12px; color: #28a745; font-weight: 600;">🔒 SSL Secure</span>
+                            <span style="font-size: 12px; color: #635bff; font-weight: 600;">⚡ Powered by Stripe</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4">
+                    <div class="checkout__order">
+                        <h5>Your Order</h5>
+                        <div class="checkout__order__product">
+                            <ul>
+                                <li>
+                                    <span class="top__text">Product</span>
+                                    <span class="top__text__right">Total</span>
+                                </li>
+                                {% for order_item in order.items.all %}
+                                <li style="display: flex;">
+                                    <span class="product__name">
+                                        {{ order_item.item.title }}
+                                        {% if order_item.item_variations.exists %}
+                                            <small>
+                                                {% for variation in order_item.item_variations.all %}
+                                                    ({{ variation.variation.name }}: {{ variation.value }})
+                                                {% endfor %}
+                                            </small>
+                                        {% endif %}
+                                        x {{ order_item.quantity }}
+                                    </span>
+                                    <span style="margin-left: auto;">${{ order_item.get_total_item_price }}</span>
+                                </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        
+                        <div class="checkout__order__total">
+                            <ul>
+                                {% if order.coupon %}
+                                <li>Discount ({{ order.coupon.code }}) <span class="discount">-${{ order.coupon.amount }}</span></li>
+                                {% endif %}
+                                <li class="order-total">Total <span style="margin-left: auto;">${{ order.get_total }}</span></li>
+                            </ul>
+                        </div>
+
+                        {% if order.shipping_address %}
+                        <div class="checkout__order__address">
+                            <h6><i class="fa fa-truck"></i> Shipping Address</h6>
+                            <p>
+                                {{ order.shipping_address.street_address }}<br>
+                                {% if order.shipping_address.apartment_address %}
+                                {{ order.shipping_address.apartment_address }}<br>
+                                {% endif %}
+                                {{ order.shipping_address.country }}, {{ order.shipping_address.zip }}
+                            </p>
+                        </div>
+                        {% endif %}
+
+                        {% if order.billing_address %}
+                        <div class="checkout__order__address">
+                            <h6><i class="fa fa-file-text-o"></i> Billing Address</h6>
+                            <p>
+                                {{ order.billing_address.street_address }}<br>
+                                {% if order.billing_address.apartment_address %}
+                                {{ order.billing_address.apartment_address }}<br>
+                                {% endif %}
+                                {{ order.billing_address.country }}, {{ order.billing_address.zip }}
+                            </p>
+                        </div>
+                        {% endif %}
+
+                        <button type="submit" class="site-btn payment-btn" id="submit-button">
+                            <span id="button-text">
+                                <i class="fa fa-lock"></i>
+                                Complete Payment ${{ order.get_total }}
+                            </span>
+                            <div id="spinner" class="spinner hidden"></div>
+                        </button>
+                        
+                        <div class="payment__methods">
+                            <span style="font-size: 24px;">💳</span>
+                            <span style="font-size: 24px;">💰</span>
+                            <span style="font-size: 24px;">🏦</span>
+                            <span style="font-size: 24px;">💵</span>
+                        </div>
+
+                        <div class="payment__guarantee">
+                            <p><i class="fa fa-check-circle"></i> 100% Secure Checkout</p>
+                            <p><i class="fa fa-refresh"></i> 30-Day Money Back Guarantee</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            {% if form.non_field_errors %}
+                <div class="form-errors">
+                    {% for error in form.non_field_errors %}
+                        <div class="alert alert-danger">{{ error }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </form>
+    </div>
+</section>
+
+<script src="https://js.stripe.com/v3/"></script>
+<script>
+    // Initialize Stripe with your publishable key
+    var stripe = Stripe('{{ stripe_public_key }}');
+    var elements = stripe.elements();
+    var style = {
+        base: {
+            color: '#32325d',
+            fontFamily: 'Arial, sans-serif',
+            fontSmoothing: 'antialiased',
+            fontSize: '16px',
+            '::placeholder': {
+                color: '#aab7c4'
+            }
+        },
+        invalid: {
+            color: '#fa755a',
+            iconColor: '#fa755a'
+        }
+    };
+
+    // Create an instance of the card Element
+    var card = elements.create('card', {style: style});
+    card.mount('#card-element');
+
+    // Handle real-time validation errors
+    card.addEventListener('change', function(event) {
+        var displayError = document.getElementById('card-errors');
+        if (event.error) {
+            displayError.textContent = event.error.message;
+            displayError.classList.add('show');
+        } else {
+            displayError.textContent = '';
+            displayError.classList.remove('show');
+        }
+    });
+
+    // Get references to elements
+    var form = document.getElementById('payment-form');
+    var submitButton = document.getElementById('submit-button');
+    var useDefaultCheckbox = document.getElementById('id_use_default');
+    var newCardSection = document.getElementById('new-card-section');
+
+    // Function to toggle display of new card section
+    function toggleNewCardSection() {
+        if (useDefaultCheckbox && useDefaultCheckbox.checked) {
+            newCardSection.style.display = 'none';
+            var saveCardCheckbox = document.getElementById('id_save');
+            if (saveCardCheckbox) {
+                saveCardCheckbox.checked = false;
+            }
+        } else {
+            newCardSection.style.display = 'block';
+        }
+    }
+
+    // Initial check on page load
+    if (useDefaultCheckbox) {
+        toggleNewCardSection();
+        useDefaultCheckbox.addEventListener('change', toggleNewCardSection);
+    }
+
+    // Handle form submission
+    form.addEventListener('submit', function(event) {
+        event.preventDefault();
+        
+        // Disable submit button to prevent double submission
+        submitButton.disabled = true;
+        document.getElementById('button-text').style.display = 'none';
+        document.getElementById('spinner').classList.remove('hidden');
+
+        var useDefault = useDefaultCheckbox && useDefaultCheckbox.checked;
+
+        if (useDefault) {
+            // If using default payment method, submit form directly
+            var tokenInput = document.getElementById('id_stripeToken');
+            if (tokenInput) {
+                tokenInput.value = '';
+            }
+            form.submit();
+        } else {
+            // Create token from card element for new card payment
+            stripe.createToken(card).then(function(result) {
+                if (result.error) {
+                    // Show error to customer
+                    var errorElement = document.getElementById('card-errors');
+                    errorElement.textContent = result.error.message;
+                    errorElement.classList.add('show');
+                    
+                    // Re-enable the submit button
+                    submitButton.disabled = false;
+                    document.getElementById('button-text').style.display = 'inline';
+                    document.getElementById('spinner').classList.add('hidden');
+                } else {
+                    // Token was created successfully
+                    var tokenInput = document.getElementById('id_stripeToken');
+                    if (tokenInput) {
+                        tokenInput.value = result.token.id;
+                        form.submit();
+                    } else {
+                        console.error('Stripe token input field not found');
+                        submitButton.disabled = false;
+                        document.getElementById('button-text').style.display = 'inline';
+                        document.getElementById('spinner').classList.add('hidden');
+                    }
+                }
+            });
+        }
+    });
+
+    // Auto-dismiss alerts
+    document.addEventListener('DOMContentLoaded', function() {
+        var alerts = document.querySelectorAll('.alert-dismissible');
+        alerts.forEach(function(alert) {
+            setTimeout(function() {
+                var closeBtn = alert.querySelector('.close');
+                if (closeBtn) {
+                    closeBtn.click();
+                }
+            }, 5000);
+        });
+    });
+</script>
+
+<style>
+/* Payment Specific Styles */
+.field-errors {
+    margin-top: 5px;
+}
+
+.field-errors small {
+    display: block;
+    margin-top: 2px;
+}
+
+.form-errors {
+    margin-bottom: 20px;
+}
+
+.form-text {
+    font-size: 12px;
+    color: #6c757d;
+    margin-top: 5px;
+    display: block;
+}
+
+.payment__card {
+    margin-bottom: 30px;
+}
+
+.payment__default-card {
+    margin-bottom: 20px;
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 6px;
+    border: 2px solid #e9ecef;
+}
+
+.payment__default-card .checkout__form__checkbox label {
+    display: flex;
+    align-items: center;
+    font-weight: 600;
+    color: #495057;
+}
+
+.payment__default-card .checkout__form__checkbox label i {
+    margin-right: 10px;
+    color: #28a745;
+}
+
+.payment__divider {
+    text-align: center;
+    margin: 20px 0;
+    position: relative;
+}
+
+.payment__divider::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: #e1e1e1;
+}
+
+.payment__divider span {
+    background: #fff;
+    padding: 0 20px;
+    color: #666;
+    font-weight: 600;
+    position: relative;
+}
+
+.card-element {
+    background: #fff;
+    padding: 15px;
+    border-radius: 4px;
+    border: 1px solid #e1e1e1;
+    font-size: 16px;
+    font-family: 'Montserrat', sans-serif;
+    transition: border-color 0.3s ease;
+}
+
+.card-element:focus-within {
+    border-color: #ca1515;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(202, 21, 21, 0.1);
+}
+
+.card-errors {
+    color: #fa755a;
+    font-size: 14px;
+    margin-top: 10px;
+    padding: 10px;
+    background: #fdf2f2;
+    border: 1px solid #fecaca;
+    border-radius: 4px;
+    display: none;
+    animation: fadeIn 0.3s ease;
+}
+
+.card-errors.show {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.payment__options {
+    margin-bottom: 30px;
+}
+
+.payment__options .checkout__form__checkbox label {
+    display: flex;
+    align-items: center;
+    color: #495057;
+}
+
+.payment__options .checkout__form__checkbox label i {
+    margin-right: 10px;
+    color: #ca1515;
+}
+
+.payment__security {
+    margin-bottom: 30px;
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 6px;
+    border-left: 4px solid #28a745;
+}
+
+.security__notice {
+    display: flex;
+    align-items: center;
+    color: #495057;
+    font-size: 14px;
+    margin-bottom: 10px;
+}
+
+.security__notice i {
+    color: #28a745;
+    margin-right: 10px;
+    font-size: 18px;
+}
+
+.security__badges {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.checkout__order__address {
+    margin-bottom: 20px;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 6px;
+    border-left: 3px solid #ca1515;
+}
+
+.checkout__order__address h6 {
+    color: #111111;
+    font-weight: 600;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+}
+
+.checkout__order__address h6 i {
+    margin-right: 8px;
+    color: #ca1515;
+}
+
+.checkout__order__address p {
+    color: #666666;
+    margin: 0;
+    line-height: 1.6;
+    font-size: 14px;
+}
+
+.product__name small {
+    display: block;
+    color: #888;
+    font-size: 12px;
+    margin-top: 2px;
+}
+
+.discount {
+    color: #28a745 !important;
+    font-weight: 600;
+}
+
+.payment-btn {
+    position: relative;
+    width: 100%;
+    height: 55px;
+    font-size: 16px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+    transition: all 0.3s ease;
+}
+
+.payment-btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(202, 21, 21, 0.3);
+}
+
+.payment-btn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.payment-btn i {
+    margin-right: 8px;
+}
+
+.spinner {
+    width: 20px;
+    height: 20px;
+    border: 2px solid #ffffff;
+    border-top: 2px solid transparent;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+.spinner.hidden {
+    display: none;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.payment__methods {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    margin: 20px 0;
+    padding: 20px 0;
+    border-top: 1px solid #e1e1e1;
+    border-bottom: 1px solid #e1e1e1;
+}
+
+.payment__guarantee {
+    text-align: center;
+    margin-top: 15px;
+}
+
+.payment__guarantee p {
+    margin: 5px 0;
+    font-size: 13px;
+    color: #666;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.payment__guarantee p i {
+    margin-right: 8px;
+    color: #28a745;
+}
+
+.order-total {
+    font-size: 18px;
+    font-weight: 700;
+    color: #ca1515;
+    border-top: 2px solid #e1e1e1;
+    padding-top: 15px;
+    margin-top: 15px;
+}
+
+.order-total span {
+    font-size: 20px;
+}
+
+.alert {
+    padding: 15px;
+    margin-bottom: 20px;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.alert-success {
+    color: #155724;
+    background-color: #d4edda;
+    border-color: #c3e6cb;
+}
+
+.alert-warning {
+    color: #856404;
+    background-color: #fff3cd;
+    border-color: #ffeaa7;
+}
+
+.alert-danger,
+.alert-error {
+    color: #721c24;
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+}
+
+.alert-info {
+    color: #0c5460;
+    background-color: #d1ecf1;
+    border-color: #bee5eb;
+}
+
+.close {
+    float: right;
+    font-size: 21px;
+    font-weight: bold;
+    line-height: 1;
+    color: #000;
+    text-shadow: 0 1px 0 #fff;
+    opacity: .5;
+    background: none;
+    border: none;
+    cursor: pointer;
+    transition: opacity 0.3s ease;
+    padding: 0;
+}
+
+.close:hover {
+    opacity: .75;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .checkout__order {
+        margin-top: 30px;
+    }
+    
+    .payment-btn {
+        height: 50px;
+        font-size: 14px;
+    }
+    
+    .security__badges {
+        justify-content: center;
+    }
+    
+    .payment__guarantee p {
+        font-size: 12px;
+    }
+}
+
+@media (max-width: 576px) {
+    .payment__default-card,
+    .payment__security,
+    .checkout__order__address {
+        padding: 15px;
+    }
+    
+    .payment__methods {
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+}
+</style>
+{% endblock %}

@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+
+    <!-- Breadcrumb Begin -->
+    <div class="breadcrumb-option">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="breadcrumb__links">
+                        <a href="{% url 'core:item-list' %}"><i class="fa fa-home"></i> Home</a>
+                        <span>Contact</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Breadcrumb End -->
+     
+    <!-- Contact Section Begin -->
+    <section class="contact spad">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-6 col-md-6">
+                    <div class="contact__content">
+                        <div class="contact__address">
+                            <h5>Contact info</h5>
+                            <ul>
+                                <li>
+                                    <h6><i class="fa fa-map-marker"></i> Address</h6>
+                                    <p>{{ my_info.address }}</p>
+                                </li>
+                                <li>
+                                    <h6><i class="fa fa-phone"></i> Phone</h6>
+                                    <p><span>{{ my_info.phone_number }}</span></p>
+                                </li>
+                                <li>
+                                    <h6><i class="fa fa-headphones"></i> Support</h6>
+                                    <p>{{ my_info.email }}</p>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="contact__form">
+                            <h5>SEND MESSAGE</h5>
+                            <form action="{% url 'contact_us:contact' %}" method="post">
+                                {% csrf_token %}
+                                <input type="text" placeholder="Name" name="name">
+                                <input type="text" placeholder="Email" name="email">
+                                <textarea placeholder="Message" name="message"></textarea>
+                                <button type="submit" class="site-btn">Send Message</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                    <div class="col-lg-6 col-md-6">
+                    <div class="contact__map" id="map">
+                        <iframe
+                        src="https://www.google.com/maps/dir//Cairo+Tower,+Kasr+Al+Nile,+Zamalek,+Cairo+Governorate+4270024/@30.0440378,31.2209648,15.92z/data=!4m16!1m7!3m6!1s0x1458409aa81d58a5:0x6ce6bf7cd258d6fe!2sCairo+Tower!8m2!3d30.046522!4d31.2242989!16zL20vMDVqN3lu!4m7!1m0!1m5!1m1!1s0x1458409aa81d58a5:0x6ce6bf7cd258d6fe!2m2!1d31.2242989!2d30.046522?entry=ttu&g_ep=EgoyMDI1MTAyMi4wIKXMDSoASAFQAw%3D%3D"
+                        height="780" style="border:0" allowfullscreen="">
+                    </iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- Contact Section End -->
+
+<!-- Map Section --
+     <h3 class="mt-5 text-center">Our Location</h3>
+    <div id="map" style="height: 400px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.3);"></div> 
+</div> 
+-->
+<!-- Leaflet.js -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        var lat = {{ latitude|default:0 }};
+        var lon = {{ longitude|default:0 }};
+        var map = L.map('map').setView([lat, lon], 13);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+        }).addTo(map);
+
+        if (lat && lon) {
+            L.marker([lat, lon]).addTo(map)
+                .bindPopup("Our Office Location")
+                .openPopup();
+        }
+    });
+</script>
+{% endblock %}
