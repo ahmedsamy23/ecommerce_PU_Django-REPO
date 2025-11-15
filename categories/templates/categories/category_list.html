@@ -1,0 +1,724 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ category|title }} - Ashion | Store{% endblock %}
+
+{% block content %}
+<!-- Breadcrumb Begin -->
+<div class="breadcrumb-option">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="breadcrumb__links">
+                    <a href="{% url 'core:item-list' %}"><i class="fa fa-home"></i> Home</a>
+                    {% if category %}
+                    <span style="margin-left: 2px;"> categories -</span>
+                    {% endif %}
+                    <span style="margin-left: 2px;">{{ category|title }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Breadcrumb End -->
+
+<!-- Shop Section Begin -->
+<section class="shop spad">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-3 col-md-3">
+                <div class="shop__sidebar">
+                    <div class="sidebar__categories">
+                        <div class="section-title">
+                            <h4>Categories</h4>
+                        </div>
+                        <div class="categories__accordion">
+                            <div class="accordion" id="accordionExample">
+                                <div class="card">
+                                    <div class="card-heading active">
+                                        <a data-toggle="collapse" data-target="#collapseOne">Women</a>
+                                    </div>
+                                    <div id="collapseOne" class="collapse show" data-parent="#accordionExample">
+                                        <div class="card-body">
+                                            <ul>
+                                                <li><a href="{% url 'categories:category-list' 'Women' %}">All Women</a></li>                                              
+                                                    {% for hyper_category in hyper_categories %}
+                                                        {% if hyper_category == 'J' %}
+                                                        <li><a href="{% url 'categories:category-list' 'Women' %}?hyper_category=J">Jeans</a></li>
+                                                        {% elif hyper_category == 'S' %}
+                                                        <li><a href="{% url 'categories:category-list' 'Women' %}?hyper_category=S">Shirts</a></li>
+                                                        {% elif hyper_category == 'C' %}
+                                                        <li><a href="{% url 'categories:category-list' 'Women' %}?hyper_category=C">Coats</a></li>
+                                                        {% elif hyper_category == 'JA' %}
+                                                        <li><a href="{% url 'categories:category-list' 'Women' %}?hyper_category=JA">Jackets</a></li>
+                                                        {% elif hyper_category == 'D' %}
+                                                        <li><a href="{% url 'categories:category-list' 'Women' %}?hyper_category=D">Dresses</a></li>
+                                                        {% endif %}
+                                                    {% endfor %}
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card">
+                                    <div class="card-heading">
+                                        <a data-toggle="collapse" data-target="#collapseTwo">Men</a>
+                                    </div>
+                                    <div id="collapseTwo" class="collapse" data-parent="#accordionExample">
+                                        <div class="card-body">
+                                            <ul>
+                                                <li><a href="{% url 'categories:category-list' 'Men' %}">All Men</a></li>
+                                                {% for hyper_category in hyper_categories %}
+                                                    {% if hyper_category == 'J' %}
+                                                    <li><a href="{% url 'categories:category-list' 'Men' %}?hyper_category=J">Jeans</a></li>
+                                                    {% elif hyper_category == 'S' %}
+                                                    <li><a href="{% url 'categories:category-list' 'Men' %}?hyper_category=S">Shirts</a></li>
+                                                    {% elif hyper_category == 'C' %}
+                                                    <li><a href="{% url 'categories:category-list' 'Men' %}?hyper_category=C">Coats</a></li>
+                                                    {% elif hyper_category == 'JA' %}
+                                                    <li><a href="{% url 'categories:category-list' 'Men' %}?hyper_category=JA">Jackets</a></li>
+                                                    {% elif hyper_category == 'D' %}
+                                                    <li><a href="{% url 'categories:category-list' 'Men' %}?hyper_category=D">Dresses</a></li>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card">
+                                    <div class="card-heading">
+                                        <a data-toggle="collapse" data-target="#collapseThree">Kids</a>
+                                    </div>
+                                    <div id="collapseThree" class="collapse" data-parent="#accordionExample">
+                                        <div class="card-body">
+                                            <ul>
+                                                <li><a href="{% url 'categories:category-list' 'Kids' %}">All Kids</a></li>
+                                                {% for hyper_category in hyper_categories %}
+                                                    {% if hyper_category == 'J' %}
+                                                    <li><a href="{% url 'categories:category-list' 'Kids' %}?hyper_category=J">Jeans</a></li>
+                                                    {% elif hyper_category == 'S' %}
+                                                    <li><a href="{% url 'categories:category-list' 'Kids' %}?hyper_category=S">Shirts</a></li>
+                                                    {% elif hyper_category == 'C' %}
+                                                    <li><a href="{% url 'categories:category-list' 'Kids' %}?hyper_category=C">Coats</a></li>
+                                                    {% elif hyper_category == 'JA' %}
+                                                    <li><a href="{% url 'categories:category-list' 'Kids' %}?hyper_category=JA">Jackets</a></li>
+                                                    {% elif hyper_category == 'D' %}
+                                                    <li><a href="{% url 'categories:category-list' 'Kids' %}?hyper_category=D">Dresses</a></li>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card">
+                                    <div class="card-heading">
+                                        <a data-toggle="collapse" data-target="#collapseFour">Accessories</a>
+                                    </div>
+                                    <div id="collapseFour" class="collapse" data-parent="#accordionExample">
+                                        <div class="card-body">
+                                            <ul>
+                                                <li><a href="{% url 'categories:category-list' 'Accessories' %}">All Accessories</a></li>
+                                                {% for hyper_category in hyper_categories %}
+                                                    {% if hyper_category == 'B' %}
+                                                    <li><a href="{% url 'categories:category-list' 'Accessories' %}?hyper_category=B">Bags</a></li>
+                                                    
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card">
+                                    <div class="card-heading">
+                                        <a data-toggle="collapse" data-target="#collapseFive">Beauty</a>
+                                    </div>
+                                    <div id="collapseFive" class="collapse" data-parent="#accordionExample">
+                                        <div class="card-body">
+                                            <ul>
+                                                <li><a href="{% url 'categories:category-list' 'Beauty' %}">All Beauty</a></li>
+                                                {% for hyper_category in hyper_categories %}
+                                                    {% if hyper_category == 'B' %}
+                                                    <li><a href="{% url 'categories:category-list' 'Beauty' %}?hyper_category=B">Bags</a></li>
+                                                    
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- <div class="sidebar__filter">
+                        <div class="section-title">
+                            <h4>Shop by price</h4>
+                        </div>
+                        <div class="filter-range-wrap">
+                            <div class="price-range ui-slider ui-corner-all ui-slider-horizontal ui-widget ui-widget-content"
+                                data-min="33" data-max="98"></div>
+                            <div class="range-slider">
+                                <div class="price-input">
+                                    <p>Price:</p>
+                                    <input type="text" id="minamount">
+                                    <input type="text" id="maxamount">
+                                </div>
+                            </div>
+                        </div>
+                        <a href="#" class="filter-btn">Filter</a>
+                    </div> -->
+                </div>
+            </div>
+            <div class="col-lg-9 col-md-9">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="shop__product__option">
+                            <div class="row">
+                                <div class="col-lg-6 col-md-6 col-sm-6">
+                                    <div class="shop__product__option__left">
+                                        <p>Showing {{ items.count }} results</p>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-md-6 col-sm-6">
+                                    <div class="shop__product__option__right">
+                                        <p>Sort by Price:</p>
+                                        <select id="sortSelect">
+                                            <option value="">Default</option>
+                                            <option value="price-low">Low To High</option>
+                                            <option value="price-high">High To Low</option>
+                                            <option value="newest">Newest</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row" id="productGrid">
+                    {% for item in items %}
+                    <div class="col-lg-4 col-md-6 col-sm-6 mix {{ item.hyper_category|lower }} product-item" 
+                         data-price="{{ item.discount_price|default:item.price }}" 
+                         data-date="{{ item.id }}">
+                        <div class="product__item">
+                            <div class="product__item__pic set-bg" data-setbg="{% if item.image %}{{ item.image.url }}{% else %}{% static 'img/product/product-1.jpg' %}{% endif %}">
+                                {% if item.label == 'S' %}
+                                <div class="label sale">Sale</div>
+                                {% elif item.label == 'N' %}
+                                <div class="label new">New</div>
+                                {% elif item.label == 'O' %}
+                                <div class="label stockout">Out Of Stock</div>
+                                {% endif %}
+                                <ul class="product__hover">
+                                    <li><a href="{% url 'core:product' item.slug %}"><span class="fa fa-eye"></span></a></li>
+                                    <li><a href="{{ item.image.url }}" class="image-popup"><span class="arrow_expand"></span></a></li>
+                                    <li><a href="{{ item.get_add_to_cart_url }}"><span class="icon_bag_alt"></span></a></li>
+                                </ul>
+                            </div>
+                            <div class="product__item__text">
+                                <h6><a href="{{ item.get_absolute_url }}">{{ item.title }}</a></h6>
+                                <div class="product__price">
+                                    {% if item.discount_price %}
+                                        ${{ item.discount_price }} <span>${{ item.price }}</span>
+                                    {% else %}
+                                        ${{ item.price }}
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="col-lg-12">
+                        <div class="empty-category">
+                            <div class="empty-category__icon">
+                                <i class="fa fa-shopping-bag"></i>
+                            </div>
+                            <h3>No products found in {{ category|title }}</h3>
+                            <p>Sorry, we couldn't find any products in this category.</p>
+                            <a href="{% url 'core:item-list' %}" class="primary-btn">Continue Shopping</a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                
+                <!-- Pagination -->
+                {% if items.count > 12 %}
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="pagination">
+                            <a href="#" class="pagination__prev"><i class="fa fa-angle-left"></i></a>
+                            <a href="#" class="pagination__number active">1</a>
+                            <a href="#" class="pagination__number">2</a>
+                            <a href="#" class="pagination__number">3</a>
+                            <a href="#" class="pagination__next"><i class="fa fa-angle-right"></i></a>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+<!-- Shop Section End -->
+
+<style>
+/* Category Page Animations */
+.product-item {
+    opacity: 0;
+    transform: translateY(30px);
+    animation: fadeInUp 0.6s ease forwards;
+}
+
+.product-item:nth-child(1) { animation-delay: 0.1s; }
+.product-item:nth-child(2) { animation-delay: 0.2s; }
+.product-item:nth-child(3) { animation-delay: 0.3s; }
+.product-item:nth-child(4) { animation-delay: 0.4s; }
+.product-item:nth-child(5) { animation-delay: 0.5s; }
+.product-item:nth-child(6) { animation-delay: 0.6s; }
+
+@keyframes fadeInUp {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.product__item {
+    transition: all 0.3s ease;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.product__item:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+}
+
+.product__item__pic {
+    position: relative;
+    overflow: hidden;
+}
+
+.product__item__pic img {
+    transition: transform 0.3s ease;
+}
+
+.product__item:hover .product__item__pic img {
+    transform: scale(1.05);
+}
+
+.label {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    padding: 5px 10px;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 600;
+    border-radius: 15px;
+    z-index: 5;
+}
+
+.label.sale {
+    background: #ff4757;
+}
+
+.label.new {
+    background: #2ed573;
+}
+
+.label.stockout {
+    background: #747d8c;
+}
+
+.product__hover {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    opacity: 0;
+    transition: all 0.3s ease;
+}
+
+.product__item:hover .product__hover {
+    opacity: 1;
+}
+
+.product__hover li {
+    list-style: none;
+    display: inline-block;
+    margin: 0 5px;
+}
+
+.product__hover li a {
+    display: block;
+    width: 40px;
+    height: 40px;
+    line-height: 40px;
+    text-align: center;
+    background: #fff;
+    border-radius: 50%;
+    color: #111;
+    transition: all 0.3s ease;
+}
+
+.product__hover li a:hover {
+    background: #111;
+    color: #fff;
+    transform: scale(1.1);
+}
+
+.breadcrumb-option {
+    background: #f8f9fa;
+    padding: 30px 0;
+    margin-bottom: 50px;
+}
+
+.breadcrumb__links {
+    font-size: 14px;
+}
+
+.breadcrumb__links a {
+    color: #666;
+    text-decoration: none;
+    margin-right: 10px;
+}
+
+.breadcrumb__links span {
+    color: #333;
+    font-weight: 600;
+}
+
+.breadcrumb__links a:hover {
+    color: #111;
+}
+
+.shop__sidebar {
+    background: #fff;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    margin-bottom: 30px;
+    position: sticky;
+    top: 20px;
+}
+
+.section-title h4 {
+    color: #333;
+    font-weight: 600;
+    margin-bottom: 20px;
+    position: relative;
+    padding-bottom: 10px;
+}
+
+.section-title h4:after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 50px;
+    height: 2px;
+    background: #111;
+}
+
+.accordion .card {
+    border: none;
+    border-bottom: 1px solid #eee;
+}
+
+.card-heading a {
+    display: block;
+    padding: 15px 0;
+    color: #333;
+    font-weight: 500;
+    text-decoration: none;
+    position: relative;
+}
+
+.card-heading a:after {
+    content: '+';
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 18px;
+    transition: transform 0.3s ease;
+}
+
+.card-heading.active a:after {
+    transform: translateY(-50%) rotate(45deg);
+}
+
+.card-body ul {
+    list-style: none;
+    padding: 0;
+}
+
+.card-body ul li {
+    margin-bottom: 8px;
+}
+
+.card-body ul li a {
+    color: #666;
+    font-size: 14px;
+    text-decoration: none;
+    padding: 5px 15px;
+    display: block;
+    border-radius: 5px;
+    transition: all 0.3s ease;
+}
+
+.card-body ul li a:hover {
+    background: #f8f9fa;
+    color: #111;
+    padding-left: 20px;
+}
+
+.shop__product__option {
+    background: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 30px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+.shop__product__option__left p {
+    color: #666;
+    font-size: 14px;
+    margin: 0;
+}
+
+.shop__product__option__right {
+    text-align: right;
+}
+
+.shop__product__option__right p {
+    display: inline-block;
+    margin-right: 10px;
+    color: #666;
+    font-size: 14px;
+}
+
+.shop__product__option__right select {
+    border: 1px solid #ddd;
+    padding: 8px 15px;
+    border-radius: 5px;
+    background: #fff;
+    color: #333;
+}
+
+.empty-category {
+    text-align: center;
+    padding: 80px 20px;
+}
+
+.empty-category__icon {
+    font-size: 80px;
+    color: #ddd;
+    margin-bottom: 30px;
+}
+
+.empty-category h3 {
+    color: #333;
+    margin-bottom: 15px;
+}
+
+.empty-category p {
+    color: #666;
+    margin-bottom: 30px;
+}
+
+.primary-btn {
+    display: inline-block;
+    padding: 12px 30px;
+    background: #111;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 25px;
+    transition: all 0.3s ease;
+}
+
+.primary-btn:hover {
+    background: #333;
+    transform: translateY(-2px);
+}
+
+.pagination {
+    text-align: center;
+    margin-top: 50px;
+}
+
+.pagination a {
+    display: inline-block;
+    padding: 10px 15px;
+    margin: 0 5px;
+    border: 1px solid #ddd;
+    color: #666;
+    text-decoration: none;
+    border-radius: 5px;
+    transition: all 0.3s ease;
+}
+
+.pagination a:hover,
+.pagination a.active {
+    background: #111;
+    color: #fff;
+    border-color: #111;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    .product-item {
+        margin-bottom: 30px;
+    }
+    
+    .shop__sidebar {
+        position: relative;
+        top: 0;
+    }
+    
+    .shop__product__option__right {
+        text-align: left;
+        margin-top: 15px;
+    }
+}
+
+/* Loading Animation */
+.loading {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+.loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 30px;
+    height: 30px;
+    margin: -15px 0 0 -15px;
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid #333;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Sorting functionality
+    const sortSelect = document.getElementById('sortSelect');
+    const productGrid = document.getElementById('productGrid');
+    
+    if (sortSelect) {
+        sortSelect.addEventListener('change', function() {
+            const sortValue = this.value;
+            const products = Array.from(document.querySelectorAll('.product-item'));
+            
+            productGrid.classList.add('loading');
+            
+            setTimeout(() => {
+                products.sort((a, b) => {
+                    const priceA = parseFloat(a.dataset.price);
+                    const priceB = parseFloat(b.dataset.price);
+                    const dateA = parseInt(a.dataset.date);
+                    const dateB = parseInt(b.dataset.date);
+                    
+                    switch(sortValue) {
+                        case 'price-low':
+                            return priceA - priceB;
+                        case 'price-high':
+                            return priceB - priceA;
+                        case 'newest':
+                            return dateB - dateA;
+                        default:
+                            return 0;
+                    }
+                });
+                
+                // Clear and re-append sorted products
+                productGrid.innerHTML = '';
+                products.forEach((product, index) => {
+                    product.style.animationDelay = `${index * 0.1}s`;
+                    productGrid.appendChild(product);
+                });
+                
+                productGrid.classList.remove('loading');
+            }, 500);
+        });
+    }
+    
+    // Sidebar accordion functionality
+    const accordionHeaders = document.querySelectorAll('.card-heading a');
+    accordionHeaders.forEach(header => {
+        header.addEventListener('click', function(e) {
+            e.preventDefault();
+            const parent = this.closest('.card');
+            const isActive = parent.querySelector('.card-heading').classList.contains('active');
+            
+            // Close all accordions
+            document.querySelectorAll('.card-heading').forEach(h => h.classList.remove('active'));
+            document.querySelectorAll('.collapse').forEach(c => c.classList.remove('show'));
+            
+            // Open clicked accordion if it wasn't active
+            if (!isActive) {
+                parent.querySelector('.card-heading').classList.add('active');
+                content.classList.add('show');
+            }
+        });
+    });
+    
+    // Image lazy loading
+    const images = document.querySelectorAll('[data-setbg]');
+    images.forEach(img => {
+        const src = img.getAttribute('data-setbg');
+        if (src) {
+            img.style.backgroundImage = `url(${src})`;
+        }
+    });
+    
+    // Product hover effects
+    const productItems = document.querySelectorAll('.product__item');
+    productItems.forEach(item => {
+        item.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-10px)';
+        });
+        
+        item.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+        });
+    });
+    
+    // Smooth scroll for pagination
+    const paginationLinks = document.querySelectorAll('.pagination a');
+    paginationLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            document.querySelector('.shop').scrollIntoView({
+                behavior: 'smooth'
+            });
+        });
+    });
+});
+
+function clearFilters() {
+    const form = document.getElementById('filter-form');
+    const inputs = form.querySelectorAll('input, select');
+    inputs.forEach(input => {
+        if (input.type === 'text' || input.type === 'number') {
+            input.value = '';
+        } else if (input.type === 'select-one') {
+            input.selectedIndex = 0;
+        }
+    });
+    showLoading();
+    setTimeout(() => {
+        form.submit();
+    }, 300);
+}
+
+</script>
+{% endblock %}
