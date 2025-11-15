@@ -1,0 +1,771 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'css/auth_pages.css' %}">
+    <style>
+        .signup__wrapper {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            padding: 40px 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .signup__bg__decoration {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .signup__bg__decoration:nth-child(1) {
+            width: 500px;
+            height: 500px;
+            top: -150px;
+            right: -150px;
+        }
+
+        .signup__bg__decoration:nth-child(2) {
+            width: 350px;
+            height: 350px;
+            bottom: -100px;
+            left: -100px;
+            animation: float 8s ease-in-out infinite reverse;
+        }
+
+        .signup__bg__decoration:nth-child(3) {
+            width: 200px;
+            height: 200px;
+            top: 50%;
+            left: 10%;
+            animation: float 10s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-30px) rotate(5deg); }
+        }
+
+        .signup__container {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+        }
+
+        .signup__card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 25px 70px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            max-width: 550px;
+            margin: 0 auto;
+            animation: slideUp 0.6s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .signup__header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 45px 40px;
+            color: white;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .signup__header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: pulse 4s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+        }
+
+        .signup__header__content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .signup__header h2 {
+            font-size: 32px;
+            margin: 0 0 10px;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        .signup__header p {
+            font-size: 15px;
+            opacity: 0.95;
+            margin: 0;
+            font-weight: 300;
+        }
+
+        .signup__body {
+            padding: 45px 40px;
+        }
+
+        .signup__alerts {
+            margin-bottom: 25px;
+        }
+
+        .signup__alert {
+            padding: 16px 20px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            font-size: 14px;
+            animation: slideDown 0.4s ease;
+            display: flex;
+            align-items: start;
+            gap: 12px;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-15px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .signup__alert--danger {
+            background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%);
+            border-left: 5px solid #ff6b6b;
+            color: #c62828;
+        }
+
+        .signup__alert__icon {
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+
+        .signup__alert__content {
+            flex: 1;
+        }
+
+        .signup__alert strong {
+            display: block;
+            margin-bottom: 4px;
+            font-size: 15px;
+        }
+
+        .signup__form__group {
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        .signup__form__group:last-of-type {
+            margin-bottom: 0;
+        }
+
+        .signup__label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: color 0.3s ease;
+        }
+
+        .signup__input__wrapper {
+            position: relative;
+        }
+
+        .signup__input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 15px;
+            font-family: inherit;
+            transition: all 0.3s ease;
+            background: #f9f9f9;
+        }
+
+        .signup__input:focus {
+            outline: none;
+            border-color: #667eea;
+            background: white;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .signup__input:focus + .signup__input__icon {
+            color: #667eea;
+            transform: scale(1.1);
+        }
+
+        .signup__input.error {
+            border-color: #ff6b6b;
+            background: #fff5f5;
+        }
+
+        .signup__input.success {
+            border-color: #4caf50;
+            background: #f1f8f4;
+        }
+
+        .signup__input::placeholder {
+            color: #bbb;
+        }
+
+        .signup__input__icon {
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #ccc;
+            transition: all 0.3s ease;
+            pointer-events: none;
+        }
+
+        .signup__help__text {
+            font-size: 12px;
+            color: #999;
+            margin-top: 6px;
+            display: block;
+            line-height: 1.4;
+        }
+
+        .signup__error__text {
+            font-size: 12px;
+            color: #ff6b6b;
+            margin-top: 6px;
+            display: block;
+            animation: shake 0.4s ease;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        .signup__password__strength {
+            margin-top: 10px;
+            height: 4px;
+            background: #e0e0e0;
+            border-radius: 2px;
+            overflow: hidden;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .signup__password__strength.active {
+            opacity: 1;
+        }
+
+        .signup__password__strength__bar {
+            height: 100%;
+            width: 0;
+            transition: all 0.4s ease;
+            border-radius: 2px;
+        }
+
+        .signup__password__strength__bar.weak {
+            width: 33%;
+            background: #ff6b6b;
+        }
+
+        .signup__password__strength__bar.medium {
+            width: 66%;
+            background: #ffb74d;
+        }
+
+        .signup__password__strength__bar.strong {
+            width: 100%;
+            background: #4caf50;
+        }
+
+        .signup__password__strength__text {
+            font-size: 11px;
+            margin-top: 4px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .signup__actions {
+            margin-top: 35px;
+        }
+
+        .signup__btn {
+            width: 100%;
+            padding: 16px 24px;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 700;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+            letter-spacing: 1.5px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .signup__btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .signup__btn:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .signup__btn--primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .signup__btn--primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        .signup__btn--primary:active {
+            transform: translateY(-1px);
+        }
+
+        .signup__btn span {
+            position: relative;
+            z-index: 1;
+        }
+
+        .signup__footer {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 30px;
+            border-top: 2px solid #f0f0f0;
+        }
+
+        .signup__footer p {
+            margin: 0;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .signup__footer a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 700;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .signup__footer a::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: #764ba2;
+            transition: width 0.3s ease;
+        }
+
+        .signup__footer a:hover::after {
+            width: 100%;
+        }
+
+        .signup__footer a:hover {
+            color: #764ba2;
+        }
+
+        /* Crispy forms styling override */
+        .signup__body .form-group {
+            margin-bottom: 25px;
+        }
+
+        .signup__body label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .signup__body input[type="text"],
+        .signup__body input[type="email"],
+        .signup__body input[type="password"] {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 15px;
+            font-family: inherit;
+            transition: all 0.3s ease;
+            background: #f9f9f9;
+        }
+
+        .signup__body input:focus {
+            outline: none;
+            border-color: #667eea;
+            background: white;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .signup__body .invalid-feedback,
+        .signup__body .text-danger {
+            font-size: 12px;
+            color: #ff6b6b;
+            margin-top: 6px;
+            display: block;
+            animation: shake 0.4s ease;
+        }
+
+        .signup__body .helptext {
+            font-size: 12px;
+            color: #999;
+            margin-top: 6px;
+            display: block;
+            line-height: 1.4;
+        }
+
+        @media (max-width: 576px) {
+            .signup__header {
+                padding: 35px 25px;
+            }
+
+            .signup__header h2 {
+                font-size: 26px;
+            }
+
+            .signup__body {
+                padding: 35px 25px;
+            }
+
+            .signup__card {
+                margin: 0 15px;
+            }
+
+            .signup__bg__decoration:nth-child(3) {
+                display: none;
+            }
+        }
+
+        .loading__spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-right: 8px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div class="signup__wrapper">
+        <div class="signup__bg__decoration"></div>
+        <div class="signup__bg__decoration"></div>
+        <div class="signup__bg__decoration"></div>
+
+        <div class="container signup__container">
+            <div class="row">
+                <div class="col-lg-8 mx-auto">
+                    <div class="signup__card">
+                        <div class="signup__header">
+                            <div class="signup__header__content">
+                                <h2>🚀 Join Us Today!</h2>
+                                <p>Create your account and start your journey with us</p>
+                            </div>
+                        </div>
+
+                        <div class="signup__body">
+                            {% if form.errors %}
+                                <div class="signup__alerts">
+                                    <div class="signup__alert signup__alert--danger">
+                                        <div class="signup__alert__icon">❌</div>
+                                        <div class="signup__alert__content">
+                                            <strong>Registration Error</strong>
+                                            <p style="margin: 0;">There was an error with your submission. Please correct the errors below.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endif %}
+
+                            <form method="post" id="signupForm" novalidate>
+                                {% csrf_token %}
+                                {{ form|crispy }}
+                                
+                                <div class="signup__actions">
+                                    <button type="submit" class="signup__btn signup__btn--primary" id="submitBtn">
+                                        <span>✓ Create Account</span>
+                                    </button>
+                                </div>
+                            </form>
+
+                            <div class="signup__footer">
+                                <p>
+                                    Already have an account? 
+                                    <a href="{% url 'login' %}">Login here →</a>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block extra_js %}
+    <script src="{% static 'js/form_validation.js' %}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('signupForm');
+            const submitBtn = document.getElementById('submitBtn');
+            const inputs = document.querySelectorAll('input[type="text"], input[type="email"], input[type="password"]');
+            
+            // Enhanced input animations
+            inputs.forEach((input, index) => {
+                // Stagger animation on load
+                input.style.opacity = '0';
+                input.style.transform = 'translateY(10px)';
+                setTimeout(() => {
+                    input.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
+                    input.style.opacity = '1';
+                    input.style.transform = 'translateY(0)';
+                }, index * 100);
+
+                // Focus/blur animations
+                input.addEventListener('focus', function() {
+                    this.style.transform = 'scale(1.01)';
+                    const label = this.previousElementSibling;
+                    if (label && label.tagName === 'LABEL') {
+                        label.style.color = '#667eea';
+                    }
+                });
+
+                input.addEventListener('blur', function() {
+                    this.style.transform = 'scale(1)';
+                    const label = this.previousElementSibling;
+                    if (label && label.tagName === 'LABEL') {
+                        label.style.color = '#555';
+                    }
+                    
+                    // Validate on blur
+                    if (this.value) {
+                        validateField(this);
+                    }
+                });
+
+                // Real-time validation
+                input.addEventListener('input', function() {
+                    if (this.classList.contains('error')) {
+                        validateField(this);
+                    }
+                    
+                    // Password strength indicator
+                    if (this.type === 'password' && this.name.includes('password1')) {
+                        updatePasswordStrength(this);
+                    }
+                });
+            });
+
+            // Password strength indicator
+            function updatePasswordStrength(input) {
+                const password = input.value;
+                const container = input.closest('.form-group');
+                
+                let strengthIndicator = container.querySelector('.signup__password__strength');
+                if (!strengthIndicator && password.length > 0) {
+                    strengthIndicator = document.createElement('div');
+                    strengthIndicator.className = 'signup__password__strength';
+                    strengthIndicator.innerHTML = `
+                        <div class="signup__password__strength__bar"></div>
+                        <div class="signup__password__strength__text"></div>
+                    `;
+                    input.parentNode.appendChild(strengthIndicator);
+                }
+                
+                if (strengthIndicator && password.length > 0) {
+                    const bar = strengthIndicator.querySelector('.signup__password__strength__bar');
+                    const text = strengthIndicator.querySelector('.signup__password__strength__text');
+                    strengthIndicator.classList.add('active');
+                    
+                    let strength = 0;
+                    let strengthText = '';
+                    
+                    // Calculate strength
+                    if (password.length >= 8) strength++;
+                    if (/[a-z]/.test(password) && /[A-Z]/.test(password)) strength++;
+                    if (/\d/.test(password)) strength++;
+                    if (/[^a-zA-Z\d]/.test(password)) strength++;
+                    
+                    bar.className = 'signup__password__strength__bar';
+                    if (strength <= 1) {
+                        bar.classList.add('weak');
+                        strengthText = 'Weak';
+                        text.style.color = '#ff6b6b';
+                    } else if (strength <= 2) {
+                        bar.classList.add('medium');
+                        strengthText = 'Medium';
+                        text.style.color = '#ffb74d';
+                    } else {
+                        bar.classList.add('strong');
+                        strengthText = 'Strong';
+                        text.style.color = '#4caf50';
+                    }
+                    
+                    text.textContent = strengthText;
+                } else if (strengthIndicator && password.length === 0) {
+                    strengthIndicator.classList.remove('active');
+                }
+            }
+
+            // Field validation
+            function validateField(input) {
+                const value = input.value.trim();
+                
+                if (input.type === 'email') {
+                    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                    if (!emailRegex.test(value)) {
+                        input.classList.add('error');
+                        input.classList.remove('success');
+                        return false;
+                    }
+                } else if (input.type === 'password') {
+                    if (value.length < 8) {
+                        input.classList.add('error');
+                        input.classList.remove('success');
+                        return false;
+                    }
+                }
+                
+                if (value.length > 0) {
+                    input.classList.remove('error');
+                    input.classList.add('success');
+                    return true;
+                }
+                
+                return false;
+            }
+
+            // Form submission
+            form.addEventListener('submit', function(e) {
+                let isValid = true;
+                
+                inputs.forEach(input => {
+                    if (input.required && !input.value.trim()) {
+                        input.classList.add('error');
+                        isValid = false;
+                    }
+                });
+                
+                if (isValid) {
+                    submitBtn.disabled = true;
+                    submitBtn.innerHTML = '<span><div class="loading__spinner"></div>Creating Account...</span>';
+                    submitBtn.style.opacity = '0.7';
+                }
+            });
+
+            // Auto-dismiss error alerts
+            const alerts = document.querySelectorAll('.signup__alert');
+            alerts.forEach(alert => {
+                setTimeout(() => {
+                    alert.style.animation = 'slideDown 0.4s ease reverse';
+                    setTimeout(() => {
+                        alert.style.display = 'none';
+                    }, 400);
+                }, 6000);
+            });
+
+            // Add floating animation to background decorations
+            const decorations = document.querySelectorAll('.signup__bg__decoration');
+            decorations.forEach((decoration, index) => {
+                decoration.style.animationDelay = `${index * 0.5}s`;
+            });
+
+            // Focus first input
+            const firstInput = inputs[0];
+            if (firstInput) {
+                setTimeout(() => {
+                    firstInput.focus();
+                }, 500);
+            }
+
+            // Add ripple effect to button
+            submitBtn.addEventListener('click', function(e) {
+                const ripple = document.createElement('span');
+                ripple.style.position = 'absolute';
+                ripple.style.borderRadius = '50%';
+                ripple.style.background = 'rgba(255, 255, 255, 0.6)';
+                ripple.style.width = '20px';
+                ripple.style.height = '20px';
+                ripple.style.left = e.offsetX + 'px';
+                ripple.style.top = e.offsetY + 'px';
+                ripple.style.transform = 'translate(-50%, -50%)';
+                ripple.style.animation = 'ripple 0.6s ease-out';
+                ripple.style.pointerEvents = 'none';
+                
+                this.appendChild(ripple);
+                
+                setTimeout(() => {
+                    ripple.remove();
+                }, 600);
+            });
+
+            // Add ripple animation
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes ripple {
+                    to {
+                        width: 200px;
+                        height: 200px;
+                        opacity: 0;
+                    }
+                }
+            `;
+            document.head.appendChild(style);
+        });
+    </script>
+{% endblock %}

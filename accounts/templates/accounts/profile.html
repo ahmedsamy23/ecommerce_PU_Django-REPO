@@ -1,0 +1,328 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'css/accounts_layout.css' %}">
+    <link rel="stylesheet" href="{% static 'css/profile_design.css' %}">
+    <style>
+        .profile__container {
+            padding: 60px 0;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+        }
+
+        .profile__card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .profile__card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.15);
+        }
+
+        .profile__header {
+            background: linear-gradient(135deg, #8b1c27 0%, #ca1515 100%);
+            padding: 40px;
+            color: white;
+            text-align: center;
+        }
+
+        .profile__header h2 {
+            font-size: 32px;
+            margin: 0;
+            font-weight: 700;
+        }
+
+        .profile__header p {
+            margin: 10px 0 0;
+            color: #000000;
+            font-size: 14px;
+            opacity: 0.9;
+            margin-bottom: 15px;
+        }
+        .profile__image__wrapper {
+            text-align: center;
+            margin: -50px 0 30px;
+            position: relative;
+            z-index: 10;
+        }
+
+        .profile__image {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            border: 5px solid white;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            object-fit: cover;
+            background: #f0f0f0;
+        }
+
+        .profile__body {
+            padding: 40px;
+        }
+
+        .profile__info__grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .profile__info__item {
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+            transition: all 0.3s ease;
+        }
+
+        .profile__info__item:hover {
+            background: #e8eaf6;
+            transform: translateX(5px);
+        }
+
+        .profile__info__label {
+            font-size: 12px;
+            text-transform: uppercase;
+            color: #999;
+            font-weight: 600;
+            margin-bottom: 8px;
+            letter-spacing: 1px;
+        }
+
+        .profile__info__value {
+            font-size: 16px;
+            color: #333;
+            font-weight: 500;
+            word-break: break-word;
+        }
+
+        .profile__bio {
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            border-left: 4px solid #764ba2;
+        }
+
+        .profile__bio__label {
+            font-size: 12px;
+            text-transform: uppercase;
+            color: #999;
+            font-weight: 600;
+            margin-bottom: 10px;
+            letter-spacing: 1px;
+        }
+
+        .profile__bio__text {
+            font-size: 15px;
+            color: #555;
+            line-height: 1.6;
+            font-style: italic;
+        }
+
+        .profile__actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .profile__btn {
+            flex: 1;
+            padding: 15px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+            letter-spacing: 1px;
+        }
+
+        .profile__btn--primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .profile__btn--primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .profile__btn--danger {
+            background: #ff6b6b;
+            color: white;
+        }
+
+        .profile__btn--danger:hover {
+            background: #ee5a52;
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(255, 107, 107, 0.4);
+        }
+
+        .profile__breadcrumb {
+            padding: 60px 0 40px;
+            background: linear-gradient(135deg, #8b1c27 0%, #ca1515 100%);
+            color: white;
+            text-align: center;
+        }
+
+        .profile__breadcrumb h1 {
+            font-size: 36px;
+            margin: 0;
+            font-weight: 700;
+        }
+
+        @media (max-width: 768px) {
+            .profile__actions {
+                flex-direction: column;
+            }
+
+            .profile__info__grid {
+                grid-template-columns: 1fr;
+            }
+
+            .profile__header {
+                padding: 30px 20px;
+            }
+
+            .profile__body {
+                padding: 30px 20px;
+            }
+
+            .profile__image {
+                width: 120px;
+                height: 120px;
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div class="profile__breadcrumb">
+        <div class="container">
+            <div class="row">
+                <div class="col-xl-12">
+                    <h1>Profile Dashboard</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="profile__container">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 mx-auto fade-in">
+                    <div class="profile__card">
+                        <div class="profile__header">
+                            <h2>{{ profile.user.get_full_name|default:profile.user.username }}</h2>
+                            <p>{{ profile.user.email }}</p>
+                        </div>
+
+                        {% if profile.image %}
+                            <div class="profile__image__wrapper">
+                                <img src="{{ profile.image.url }}" alt="Profile Image" class="profile__image">
+                            </div>
+                        {% endif %}
+
+                        <div class="profile__body">
+                            <div class="profile__info__grid">
+                                <div class="profile__info__item">
+                                    <div class="profile__info__label">Username</div>
+                                    <div class="profile__info__value">{{ profile.user.username }}</div>
+                                </div>
+
+                                <div class="profile__info__item">
+                                    <div class="profile__info__label">Email Address</div>
+                                    <div class="profile__info__value">{{ profile.user.email }}</div>
+                                </div>
+
+                                <div class="profile__info__item">
+                                    <div class="profile__info__label">Phone Number</div>
+                                    <div class="profile__info__value">
+                                        {{ profile.phone_number|default:"Not provided" }}
+                                    </div>
+                                </div>
+
+                                <div class="profile__info__item">
+                                    <div class="profile__info__label">City / Address</div>
+                                    <div class="profile__info__value">
+                                        {{ profile.city|default:"Not specified" }}
+                                    </div>
+                                </div>
+                            </div>
+
+                            {% if profile.bio %}
+                                <div class="profile__bio">
+                                    <div class="profile__bio__label">Bio</div>
+                                    <div class="profile__bio__text">{{ profile.bio }}</div>
+                                </div>
+                            {% endif %}
+
+                            <div class="profile__actions">
+                                <a href="{% url 'accounts:profile_edit' %}" class="profile__btn profile__btn--primary">
+                                    ✎ Edit Profile
+                                </a>
+                                <a href="{% url 'accounts:profile_delete' %}" class="profile__btn profile__btn--danger">
+                                    🗑 Delete Profile
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block extra_js %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add smooth scroll animation
+            const card = document.querySelector('.profile__card');
+            card.classList.add('fade-in');
+
+            // Info items animation
+            const infoItems = document.querySelectorAll('.profile__info__item');
+            infoItems.forEach((item, index) => {
+                item.style.opacity = '0';
+                item.style.animation = `fadeIn 0.5s ease ${index * 0.1}s forwards`;
+            });
+
+            // Button interactions
+            const buttons = document.querySelectorAll('.profile__btn');
+            buttons.forEach(btn => {
+                btn.addEventListener('mouseenter', function() {
+                    this.style.transform = 'scale(1.02)';
+                });
+                btn.addEventListener('mouseleave', function() {
+                    this.style.transform = 'scale(1)';
+                });
+            });
+        });
+    </script>
+{% endblock %}

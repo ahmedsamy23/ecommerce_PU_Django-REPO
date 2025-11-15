@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'css/auth_pages.css' %}">
+{% endblock %}
+
+{% block content %}
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-lg-6 mx-auto text-center">
+                <p class="alert alert-success">Logged out!</p>
+                <a href="{% url 'login' %}" class="boxed-btn3">Click here to login again</a>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block extra_js %}
+    <script src="{% static 'js/auth_interactions.js' %}"></script>
+{% endblock %}

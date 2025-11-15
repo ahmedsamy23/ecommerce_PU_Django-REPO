@@ -1,0 +1,445 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'css/auth_pages.css' %}">
+    <style>
+        .login__wrapper {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            padding: 40px 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .login__bg__decoration {
+            position: absolute;
+            width: 400px;
+            height: 400px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            top: -100px;
+            right: -100px;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .login__bg__decoration:nth-child(2) {
+            width: 300px;
+            height: 300px;
+            bottom: -50px;
+            left: -50px;
+            animation: float 8s ease-in-out infinite reverse;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-30px); }
+        }
+
+        .login__container {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+        }
+
+        .login__card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            max-width: 450px;
+            margin: 0 auto;
+            animation: slideUp 0.6s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .login__header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 40px;
+            color: white;
+            text-align: center;
+        }
+
+        .login__header h2 {
+            font-size: 28px;
+            margin: 0 0 10px;
+            font-weight: 700;
+        }
+
+        .login__header p {
+            font-size: 14px;
+            opacity: 0.9;
+            margin: 0;
+        }
+
+        .login__body {
+            padding: 40px;
+        }
+
+        .login__alerts {
+            margin-bottom: 25px;
+        }
+
+        .login__alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-size: 14px;
+            animation: slideDown 0.4s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .login__alert--danger {
+            background: #ffebee;
+            border-left: 4px solid #ff6b6b;
+            color: #c62828;
+        }
+
+        .login__alert--warning {
+            background: #fff3e0;
+            border-left: 4px solid #ffb74d;
+            color: #e65100;
+        }
+
+        .login__alert--info {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            color: #1565c0;
+        }
+
+        .login__form__group {
+            margin-bottom: 22px;
+        }
+
+        .login__form__group:last-child {
+            margin-bottom: 0;
+        }
+
+        .login__label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .login__input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: inherit;
+            transition: all 0.3s ease;
+            background: #f9f9f9;
+        }
+
+        .login__input:focus {
+            outline: none;
+            border-color: #667eea;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .login__input::placeholder {
+            color: #bbb;
+        }
+
+        .login__actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 30px;
+        }
+
+        .login__btn {
+            flex: 1;
+            padding: 14px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+            letter-spacing: 1px;
+        }
+
+        .login__btn--primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .login__btn--primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .login__btn--secondary {
+            background: #e0e0e0;
+            color: #333;
+            text-decoration: none;
+        }
+
+        .login__btn--secondary:hover {
+            background: #d0d0d0;
+            transform: translateY(-3px);
+        }
+
+        .login__footer {
+            text-align: center;
+            margin-top: 25px;
+            padding-top: 25px;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .login__footer p {
+            margin: 0 0 10px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .login__footer a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .login__footer a:hover {
+            color: #764ba2;
+            text-decoration: underline;
+        }
+
+        .login__divider {
+            text-align: center;
+            margin: 25px 0;
+            position: relative;
+            color: #ccc;
+        }
+
+        .login__divider::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            width: 100%;
+            height: 1px;
+            background: #e0e0e0;
+        }
+
+        .login__divider span {
+            background: white;
+            padding: 0 10px;
+            position: relative;
+            z-index: 1;
+        }
+
+        @media (max-width: 480px) {
+            .login__header {
+                padding: 30px 20px;
+            }
+
+            .login__body {
+                padding: 30px 20px;
+            }
+
+            .login__actions {
+                flex-direction: column;
+            }
+
+            .login__card {
+                margin: 0 15px;
+            }
+        }
+
+        .error-shake {
+            animation: shake 0.4s ease;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div class="login__wrapper">
+        <div class="login__bg__decoration"></div>
+        <div class="login__bg__decoration"></div>
+
+        <div class="container login__container">
+            <div class="row">
+                <div class="col-lg-6 mx-auto">
+                    <div class="login__card">
+                        <div class="login__header">
+                            <h2>Welcome Back!</h2>
+                            <p>Sign in to your account to continue</p>
+                        </div>
+
+                        <div class="login__body">
+                            {% if form.errors %}
+                                <div class="login__alerts">
+                                    <div class="login__alert login__alert--danger error-shake">
+                                        <strong>❌ Login Failed</strong>
+                                        <p style="margin: 5px 0 0;">Your username and password didn't match. Please try again.</p>
+                                    </div>
+                                </div>
+                            {% endif %}
+
+                            {% if next %}
+                                {% if user.is_authenticated %}
+                                    <div class="login__alerts">
+                                        <div class="login__alert login__alert--warning">
+                                            <strong>⚠️ Access Denied</strong>
+                                            <p style="margin: 5px 0 0;">Your account doesn't have access to this page. Please login with an account that has access.</p>
+                                        </div>
+                                    </div>
+                                {% else %}
+                                    <div class="login__alerts">
+                                        <div class="login__alert login__alert--info">
+                                            <strong>ℹ️ Login Required</strong>
+                                            <p style="margin: 5px 0 0;">Please login to see this page.</p>
+                                        </div>
+                                    </div>
+                                {% endif %}
+                            {% endif %}
+
+                            <form method="post" action="{% url 'login' %}" id="loginForm">
+                                {% csrf_token %}
+
+                                <div class="login__form__group">
+                                    <label for="id_username" class="login__label">📧 Username</label>
+                                    <input 
+                                        type="text" 
+                                        id="id_username" 
+                                        name="username" 
+                                        class="login__input" 
+                                        placeholder="Enter your username"
+                                        autocomplete="username"
+                                        required
+                                    >
+                                </div>
+
+                                <div class="login__form__group">
+                                    <label for="id_password" class="login__label">🔒 Password</label>
+                                    <input 
+                                        type="password" 
+                                        id="id_password" 
+                                        name="password" 
+                                        class="login__input" 
+                                        placeholder="Enter your password"
+                                        autocomplete="current-password"
+                                        required
+                                    >
+                                </div>
+
+                                <div class="login__actions">
+                                    <button type="submit" class="login__btn login__btn--primary">
+                                        ✓ Login
+                                    </button>
+                                    <a href="{% url 'accounts:signup' %}" class="login__btn login__btn--secondary">
+                                        + Register
+                                    </a>
+                                </div>
+                            </form>
+
+                            <div class="login__footer">
+                                <p>
+                                    <a href="{% url 'password_reset' %}">🔑 Forgot your password?</a>
+                                </p>
+                                <p style="font-size: 12px; color: #999;">
+                                    Don't have an account? <a href="{% url 'accounts:signup' %}">Create one now</a>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block extra_js %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('loginForm');
+            const inputs = document.querySelectorAll('.login__input');
+
+            // Input focus animations
+            inputs.forEach(input => {
+                input.addEventListener('focus', function() {
+                    this.style.transform = 'scale(1.01)';
+                });
+
+                input.addEventListener('blur', function() {
+                    this.style.transform = 'scale(1)';
+                });
+
+                // Show password toggle would go here if needed
+                input.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter' && this === inputs[inputs.length - 1]) {
+                        form.submit();
+                    }
+                });
+            });
+
+            // Form submission
+            form.addEventListener('submit', function(e) {
+                const submitBtn = this.querySelector('[type="submit"]');
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '⏳ Signing in...';
+                submitBtn.style.opacity = '0.6';
+            });
+
+            // Auto-dismiss alerts after 5 seconds
+            const alerts = document.querySelectorAll('.login__alert');
+            alerts.forEach(alert => {
+                setTimeout(() => {
+                    alert.style.animation = 'slideDown 0.4s ease reverse';
+                    setTimeout(() => {
+                        alert.style.display = 'none';
+                    }, 400);
+                }, 5000);
+            });
+
+            // Add some keyboard interactions
+            const usernameInput = document.getElementById('id_username');
+            const passwordInput = document.getElementById('id_password');
+
+            if (usernameInput && usernameInput.value === '') {
+                usernameInput.focus();
+            }
+        });
+    </script>
+{% endblock %}

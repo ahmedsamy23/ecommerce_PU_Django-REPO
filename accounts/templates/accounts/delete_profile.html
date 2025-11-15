@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'css/accounts_layout.css' %}">
+    <link rel="stylesheet" href="{% static 'css/forms_styling.css' %}">
+{% endblock %}
+
+{% block content %}
+    <div class="bradcam_area bradcam_bg_1">
+        <div class="container">
+            <div class="row">
+                <div class="col-xl-12">
+                    <div class="bradcam_text">
+                        <h3>Delete Profile</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="job_details_area">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-6 mx-auto">
+                    <div class="apply_job_form white-bg p-4 shadow-sm" style="border-radius: 10px;">
+                        <h4 class="mb-4 text-center">Are you sure?</h4>
+                        <p class="text-center">This action will delete your profile permanently. You will need to sign up again to create a new profile.</p>
+
+                        <form method="post">
+                            {% csrf_token %}
+                            <div class="form-group mt-4 d-flex justify-content-between">
+                                <input type="submit" value="Yes, Delete" class="boxed-btn3 w-100 mr-2 mb-3" />
+                                <a href="{% url 'accounts:profile' %}" class="boxed-btn3 w-100 mb-3">Cancel</a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block extra_js %}
+    <script src="{% static 'js/accounts_behavior.js' %}"></script>
+{% endblock %}
